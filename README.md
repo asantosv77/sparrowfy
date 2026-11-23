@@ -38,8 +38,36 @@ Open [localhost:8081](http://localhost:8081). Administrators and library manager
 
 The repository stays private until the complete APK is added and its repository link is confirmed. The server and web app are provided **AS IS** under the [Apache 2.0 license](LICENSE). See the [credits](NOTICE) and [third-party notices](app/public/THIRD_PARTY_LICENSES.md).
 
-## Captura del sitio / Live site screenshot
+## Galería / Gallery
+
+> **Nota sobre las pruebas.** Las descargas que aparecen en las capturas se realizaron únicamente para probar el flujo de importación. Los archivos descargados se eliminaron porque no se contaba con los derechos de uso y reproducción.
+>
+> **Testing note.** The downloads shown in the screenshots were made solely to test the import workflow. The downloaded files were deleted because we did not have the rights to use or play them.
+
+### Reproductor / Player
+
+| Letras sincronizadas / Synchronized lyrics | Cola de reproducción / Playback queue |
+| --- | --- |
+| ![Reproducción con letras sincronizadas](docs/images/player-lyrics.png) | ![Reproducción con la cola abierta](docs/images/player-queue.png) |
+
+### Biblioteca y minirreproductor / Library and mini player
+
+![Biblioteca con barra de reproducción inferior / Library with bottom playback bar](docs/images/library-player.png)
+
+![Biblioteca con minirreproductor flotante / Library with floating mini player](docs/images/library-compact-player.png)
+
+### Selección de fuente e importación / Source selection and import
+
+| Elegir fuente / Choose a source | En cola / Queued |
+| --- | --- |
+| ![Búsqueda y selección de fuente](docs/images/source-search.png) | ![Trabajo en cola en el servidor](docs/images/import-queued.png) |
+
+| Descarga del audio original / Downloading source audio | Publicación en la biblioteca / Publishing to the library |
+| --- | --- |
+| ![El servidor descarga el audio original](docs/images/import-downloading.png) | ![El servidor publica la pista en la biblioteca](docs/images/import-publishing.png) |
+
+### Oír sin conexión / Offline listening
 
 ![Pantalla para oír sin conexión / Offline listening screen](docs/images/offline.jpg)
 
-Origen / Source: [Sparrow-Fy](https://sparrowfy.ddns.info).
+Origen / Source · [Sparrow-Fy](https://sparrowfy.ddns.info)

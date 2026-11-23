@@ -171,8 +171,8 @@ COPY images/php-imagemagic/site.conf /etc/apache2/sites-available/000-default.co
 COPY images/php-imagemagic/www.policy.xml /etc/ImageMagick-6/policy.xml
 COPY images/php-imagemagic/php-hardening.ini /usr/local/etc/php/conf.d/98-hardening.ini
 COPY images/php-imagemagic/php-session.ini /usr/local/etc/php/conf.d/99-session-security.ini
-COPY images/php-imagemagic/start.sh images/php-imagemagic/health.sh /opt/sparrowfy/
-RUN install -m 0755 /opt/sparrowfy/start.sh /usr/local/bin/sparrowfy-start && install -m 0755 /opt/sparrowfy/health.sh /usr/local/bin/sparrowfy-health
+COPY images/php-imagemagic/start.sh images/php-imagemagic/health.sh images/php-imagemagic/processing.sh /opt/sparrowfy/
+RUN install -m 0755 /opt/sparrowfy/start.sh /usr/local/bin/sparrowfy-start && install -m 0755 /opt/sparrowfy/health.sh /usr/local/bin/sparrowfy-health && install -m 0755 /opt/sparrowfy/processing.sh /usr/local/bin/sparrowfy-processing
 RUN set -eux; : > /etc/apache2/ports.conf; a2enmod rewrite headers;     install -d -o www-data -g www-data -m 0770 data backups /sparrowfy /sparrowfy/database /sparrowfy/hls_out /sparrowfy/inbox;     install -d -o www-data -g www-data -m 0700 /var/lib/hlsml-sessions;     ln -s /sparrowfy/hls_out hls_out; chmod -R a+rx scripts;     php -r 'foreach (["pdo_sqlite","sqlite3","imagick","gd"] as $e) if (!extension_loaded($e)) exit(1);';     apache2ctl -t
 USER www-data
 EXPOSE 8080

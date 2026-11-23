@@ -73,7 +73,7 @@ La entrada activa está en el crontab de `pi`. El filtro de tareas Sparrowfy no 
 | external-ai | `php scripts/ai_external_maintenance.php` | Cada minuto da oportunidad de ejecutar mantenimiento externo conforme a la configuración y la cola. |
 | backup | `nice -n 15 python3 scripts/maintenance.py backup` | A partir de las 04:17 en `America/Mexico_City`. Registra un éxito por fecha y reintenta fallos a partir de una hora. Recupera la ejecución tras un reinicio si ya pasó la hora. |
 
-El despachador arranca un hijo por trabajo. Cada hijo mantiene su propio `flock` no bloqueante en `data/cron-control`. Las tareas PHP y el respaldo usan `docker exec -u www-data -w /var/www/html/audio www`. Un segundo despachador que apuntara al mismo catálogo podría consumir la misma cola. El despliegue paralelo debe tener datos propios y el planificador desactivado por defecto.
+El despachador arranca un hijo por trabajo. Cada hijo mantiene su propio `flock` no bloqueante en `data/cron-control`. Las tareas PHP y el respaldo usan `docker exec -u www-data -w /var/www/html/audio www`. Un segundo despachador que apuntara al mismo catálogo podría consumir la misma cola. El despliegue paralelo debe tener datos propios y las tareas auxiliares desactivadas por defecto.
 
 ### Dependencias y configuración
 
@@ -159,7 +159,7 @@ La imagen instala las piezas de `app/` en `/var/www/html/audio` para conservar l
 
 La imagen crea un catálogo vacío desde los 103 objetos de esquema extraídos de SQLite. Los datos del catálogo, las cuentas, las contraseñas, los estados de sesión y los archivos multimedia de producción quedan fuera del paquete. La inicialización usa un archivo temporal y publica la base completa únicamente cuando termina. Un volumen que ya contiene la biblioteca conserva sus datos.
 
-El cron del deploy se activa con `SPARROWFY_CRON_ENABLED=1`. Un bucle del contenedor web llama al despachador cada minuto y sus trabajos locales se ejecutan como `www-data`. El despachador conserva los locks, estado de respaldo, rotación y horarios del original. El monitor de pruebas lee la memoria del contenedor por cgroups v2 y el uso del disco HLS. El monitor del host original también mide CPU y el contenedor ajeno `dbwww`. El proyecto de pruebas carece de acceso al socket Docker del host.
+La cola de importación y conversión arranca al iniciar el contenedor web. Con `SPARROWFY_CRON_ENABLED=0` el trabajador vuelve a revisar la cola 15 segundos después de cada pasada. Con `SPARROWFY_CRON_ENABLED=1` el despachador ejecuta la cola y las tareas auxiliares cada minuto. Los trabajos se ejecutan como `www-data`. El despachador conserva los locks, estado de respaldo, rotación y horarios del original. El monitor de pruebas lee la memoria del contenedor por cgroups v2 y el uso del disco HLS. El monitor del host original también mide CPU y el contenedor ajeno `dbwww`. El proyecto de pruebas carece de acceso al socket Docker del host.
 
 ### Raspberry Pi · ARM64
 
@@ -241,7 +241,7 @@ Compose admite rutas absolutas en `MEDIA_SOURCE`, `DATA_SOURCE`, `SESSION_SOURCE
 | `SPARROWFY_HOST`, `TZ` | `sparrowfy.ddns.info`, `America/Mexico_City`. |
 | `RUNTIME_STAGE` | `sparrowfy-dependencies` compila la receta completa. `vaultwarden-www` reutiliza el runtime ya construido de esta Pi. |
 | `HLS_MUSIC_LAB_SQLITE_DB` | `/sparrowfy/database/library.sqlite`. |
-| `SPARROWFY_CRON_ENABLED` | `0`. Activar únicamente para el catálogo al que deba prestar servicio. |
+| `SPARROWFY_CRON_ENABLED` | `0` inicia solo la cola de procesamiento. `1` activa también las tareas programadas auxiliares. |
 | `MORNYE_API_URL` | `http://mornye-api:8000` en red compartida. Desde Desktop puede usarse `http://PI_HOST:18081` si la Pi es accesible. |
 | `SPOTIFY_CHARTS_BRIDGE` | `http://spotify-charts:8099` en la red del servicio. |
 | `GENIUS_ACCESS_TOKEN`, `MUSIXMATCH_API_KEY` | Opcionales. Los ejemplos incluyen valores vacíos. |
@@ -256,6 +256,10 @@ docker network connect vaultwarden_nginx "$(docker compose ps -q www)"
 docker compose exec -T www curl -fsS http://spotify-charts:8099/health
 docker compose exec -T www curl -fsS http://mornye-api:8000/api/v1/info
 ```
+
+### Posibles duplicados
+
+La búsqueda de coincidencias consulta las pistas ya publicadas. Dos importaciones iniciadas casi al mismo tiempo pueden publicar versiones de la misma canción antes de que aparezca una coincidencia.
 
 ### Respaldos y comprobaciones
 

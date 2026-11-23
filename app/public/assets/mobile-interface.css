@@ -1,0 +1,116 @@
+/* Compact mobile catalogue; desktop layout and pinch zoom are unchanged. */
+.sf-mobile-menu-toggle,.sf-mobile-menu-backdrop{display:none}
+@media(max-width:720px){
+ .app-shell{font-size:14px}
+ .app-shell .lab-header{gap:7px;padding:8px 10px}
+ .app-shell .sparrow-brand{gap:6px}
+ .app-shell .sparrow-brand__logo{width:30px;height:30px}
+ .app-shell .sparrow-brand__text strong{font-size:.78rem}
+ .app-shell .top-search{min-height:36px;border-radius:9px;padding:0 9px}
+ .app-shell .top-search input{padding:6px 0;font-size:16px}
+ .app-shell .header-actions{gap:5px}
+ .app-shell .header-actions .btn{min-height:32px;padding:5px 8px;font-size:.72rem}
+ .app-shell .header-actions .icon-btn{width:32px;height:32px;min-height:32px}
+ .app-shell .lab-nav{gap:3px;padding:5px 7px}
+ .app-shell .lab-nav a{min-height:34px;padding:6px 9px;font-size:.77rem}
+ .app-shell .lab-main{padding:10px 8px calc(90px + env(safe-area-inset-bottom,0px))}
+ .app-shell .card{padding:12px;border-radius:11px;margin-bottom:10px}
+ .app-shell h2{font-size:1.12rem;margin-top:4px;margin-bottom:12px}
+ .app-shell h3,.app-shell .subh{font-size:.95rem}
+ .app-shell .album-grid{gap:7px;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .app-shell .album-card{padding:6px;gap:5px;border-radius:10px}
+ .app-shell .album-card-title{font-size:.82rem;line-height:1.25}
+ .app-shell .album-card .muted{font-size:.75rem}
+ .app-shell .album-card .job-actions{gap:4px}
+ .app-shell .album-card .job-actions .btn{font-size:.72rem;padding:4px 6px}
+ .app-shell .play-badge{width:30px;height:30px;right:6px;bottom:6px;font-size:.8rem}
+ .app-shell .album-menu-btn{width:30px;height:30px;top:5px;right:5px}
+ .app-shell .btn{font-size:.78rem;padding:5px 8px;min-height:30px}
+ .app-shell .sf-home-favorites{padding:9px;gap:8px;margin:8px 0 12px}
+ .app-shell .sf-home-favorites>div{min-width:120px}
+ .app-shell .sf-favorites-emblem{width:34px;height:34px;font-size:24px}
+ .app-shell .sf-home-favorites p{font-size:.78rem}
+ .app-shell .sf-compact-tracks>li,.app-shell .loose-track-list>li{gap:5px;padding:7px 0!important}
+ .app-shell .sf-compact-tracks .job-actions,.app-shell .loose-track-list .job-actions{gap:4px}
+ .app-shell .loose-track-list .loose-track-meta{grid-template-columns:34px minmax(0,1fr);gap:2px 7px}
+ .app-shell .loose-artwork{width:34px;height:34px}
+ .app-shell .sf-page-size,.app-shell .sf-pagination{gap:5px;margin:10px 0;font-size:.78rem}
+ .app-shell .sf-page-size select{min-height:30px;padding:3px 6px}
+ .app-shell .artist-grid{gap:7px}.app-shell .artist-card{padding:9px;gap:9px}
+ .app-shell .artist-avatar{width:38px;height:38px;flex-basis:38px}
+ .app-shell .theme-menu>summary{padding:6px 9px;font-size:.77rem}
+}
+@media(min-width:480px) and (max-width:720px){.app-shell .album-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+@media(max-width:720px){
+ html[data-mobile-menu="hamburger"] .sf-mobile-menu-toggle{display:grid;place-items:center;grid-column:2;grid-row:1;justify-self:end;width:38px;height:36px;border:1px solid var(--border);border-radius:9px;color:var(--text);background:var(--surface-raised,var(--card));cursor:pointer}
+ html[data-mobile-menu="hamburger"] .app-shell .lab-nav{position:fixed;inset:auto 10px auto auto;top:var(--sf-mobile-menu-top,52px);width:min(290px,calc(100vw - 20px));height:auto;min-height:0;max-height:calc(100dvh - var(--sf-mobile-menu-top,52px) - 12px - env(safe-area-inset-bottom,0px));overflow:auto;flex-direction:column;align-items:stretch;gap:3px;padding:10px;border:1px solid var(--border);border-radius:13px;background:var(--card);box-shadow:0 18px 50px #0008;z-index:1001;visibility:hidden;pointer-events:none;scroll-snap-type:none}
+ html[data-mobile-menu="hamburger"].sf-mobile-menu-open .app-shell .lab-nav{visibility:visible;pointer-events:auto}
+ html[data-mobile-menu="hamburger"] .app-shell .lab-nav a{flex:none;white-space:normal;min-height:36px}
+ html[data-mobile-menu="hamburger"] .lab-nav .nav-section-label{display:block;font-size:.62rem;padding:6px 9px 2px}
+ html[data-mobile-menu="hamburger"] .lab-nav .theme-menu{margin:5px 0 0}
+ html[data-mobile-menu="hamburger"].sf-mobile-menu-open .sf-mobile-menu-backdrop:not([hidden]){display:block;position:fixed;inset:0;width:100%;height:100%;border:0;padding:0;background:#0005;z-index:1000;cursor:default}
+ .sf-mobile-menu-toggle:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+}
+
+/* One loose track per mobile row. Full title is available by holding/focusing it. */
+.sf-loose-title-preview{position:fixed;z-index:11010;max-width:calc(100vw - 20px);padding:10px 12px;border:1px solid var(--primary);border-radius:9px;background:var(--card);color:var(--text);box-shadow:0 8px 30px #0007;overflow-wrap:anywhere;white-space:normal;font-size:14px;line-height:1.4;pointer-events:none}
+.sf-loose-title-preview[hidden]{display:none}
+@media(max-width:720px){
+ .app-shell .loose-track-list>li{grid-template-columns:minmax(0,1fr) auto!important;align-items:center;gap:4px;padding:5px 0!important}
+ .app-shell .loose-track-list .loose-track-meta{min-width:0;grid-template-columns:24px minmax(0,1fr);gap:0 5px}
+ .app-shell .loose-track-list .loose-artwork{width:24px;height:24px;border-radius:5px}
+ .app-shell .loose-track-list .sf-loose-title{display:block;min-width:0;max-width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;overflow-wrap:normal;font-size:11.5px;line-height:1.35;touch-action:pan-y pinch-zoom;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;cursor:help}
+ .app-shell .loose-track-list .sf-loose-title:focus-visible{outline:1px solid var(--primary);outline-offset:2px}
+ .app-shell .loose-track-list .loose-track-meta>.muted{font-size:9px;line-height:1.2;white-space:nowrap}
+ .app-shell .loose-track-list .job-actions{flex-wrap:nowrap!important;gap:3px;min-width:0}
+ .app-shell .loose-track-list .sf-track-actions{display:inline-flex;flex-wrap:nowrap;gap:3px;flex:0 0 auto;width:auto;margin:0}
+ .app-shell .loose-track-list .job-actions .btn{min-height:28px;height:28px;min-width:24px;padding:0 4px!important;font-size:11px;border-radius:6px;white-space:nowrap;flex:0 0 auto}
+ .app-shell .loose-track-list .job-actions .sf-star{width:24px;min-width:24px;font-size:16px;padding:0!important}
+ .app-shell .loose-track-list .job-actions .sf-list-picker{width:26px;font-size:0}
+ .app-shell .loose-track-list .sf-list-picker::after{content:'☷';font-size:17px}
+ .app-shell .loose-track-list .sf-loose-play-label{display:none}
+ .app-shell .loose-track-list .sf-loose-destination>span{display:none}
+ .app-shell .loose-track-list .job-actions .sf-loose-destination{margin:0;gap:0;flex:0 0 auto}
+ .app-shell .loose-track-list .sf-loose-destination select{width:46px;max-width:46px;min-width:0;height:28px;min-height:28px;padding:0 1px;font-size:10px;margin:0}
+ .app-shell .loose-track-list .job-actions [data-move-track]{width:24px;font-size:0}
+ .app-shell .loose-track-list [data-move-track]::after{content:'↗';font-size:17px}
+ .app-shell .loose-track-list .sf-track-options{margin-left:0}
+ .app-shell .loose-track-list .sf-track-options>summary{width:24px;height:28px;display:grid;place-items:center;padding:0;font-size:18px;line-height:1;border-radius:6px}
+}
+@media(max-width:350px){.app-shell .loose-track-list .loose-artwork{display:none}.app-shell .loose-track-list .loose-track-meta{grid-template-columns:minmax(0,1fr)}.app-shell .loose-track-list .loose-track-meta>strong,.app-shell .loose-track-list .loose-track-meta>.muted{grid-column:1}}
+
+@media(max-width:720px){
+ .app-shell .loose-track-list .job-actions>a[href*="player.php"]{display:none!important}
+ .app-shell .loose-track-list .sf-loose-title{cursor:pointer}
+ .sf-loose-title-preview{pointer-events:auto}
+}
+
+.sf-loose-mobile-hint{display:none}
+@media(max-width:720px){.app-shell .sf-loose-mobile-hint{display:block;font-size:10px;line-height:1.4;margin:7px 0}.app-shell .loose-track-list .sf-loose-title{touch-action:manipulation}}
+
+/* Give the removed play button's space to the remaining touch controls. */
+@media(max-width:720px){
+ .app-shell .loose-track-list .job-actions{width:183px;justify-content:space-between!important}
+ .app-shell .loose-track-list .job-actions .btn{height:30px;min-height:30px}
+ .app-shell .loose-track-list .job-actions .sf-star{width:28px;min-width:28px}
+ .app-shell .loose-track-list .job-actions .sf-list-picker{width:30px}
+ .app-shell .loose-track-list .sf-loose-destination select{width:52px;max-width:52px;height:30px;min-height:30px}
+ .app-shell .loose-track-list .job-actions [data-move-track]{width:28px}
+ .app-shell .loose-track-list .sf-track-options>summary{width:28px;height:30px}
+ /* Listeners have fewer controls: reserve only their previous action width. */
+ .app-shell .loose-track-list>li:not([data-track-id]) .job-actions{width:81px}
+}
+
+/* Device-specific appearance controls, including the panel portaled to body. */
+.theme-menu__panel .sf-theme-mobile{display:none}
+.theme-menu__panel .theme-choice{padding:7px;gap:8px}
+.theme-menu__panel .theme-menu__title{margin:3px 5px 7px}
+.theme-menu__panel .theme-menu__note{font-size:.65rem;line-height:1.3}
+@media(max-width:720px){
+ .theme-menu__panel .sf-theme-desktop{display:none}
+ .theme-menu__panel button.sf-theme-mobile{display:flex}
+ .theme-menu__panel p.sf-theme-mobile{display:block}
+ .theme-menu__panel .theme-swatch{width:27px;height:27px;flex-basis:27px}
+ .theme-menu__panel .theme-choice{padding:5px 7px}
+}

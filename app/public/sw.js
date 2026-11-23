@@ -1,0 +1,21 @@
+/* Only explicit per-account audio downloads and public offline assets persist.
+ * Authentication pages, APIs, account data and cookies are never cached.
+ */
+importScripts('assets/offline-store.js');
+const SHELL='sf-shell-v11-lang',ASSETS=['assets/sf-language.js','assets/sf-en.json','offline.html','assets/lab.css','assets/offline-store.js','assets/offline-quality.js','assets/offline-downloads.js','assets/offline-page.js','assets/offline-page.css','assets/hls-1.5.17.min.js'];
+let audioIndex=null;
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(SHELL);await c.addAll(ASSETS.map(url=>new Request(new URL(url,self.registration.scope),{cache:'reload'})));await self.skipWaiting();})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const name of await caches.keys())if(name.startsWith('sf-shell-')&&name!==SHELL)await caches.delete(name);await self.clients.claim();})()));
+self.addEventListener('message',e=>{if(e.data?.type==='SF_OFFLINE_CHANGED')audioIndex=null;if(e.data?.type==='SF_OFFLINE_PING')e.ports?.[0]?.postMessage({offline:true,version:SHELL});});
+async function cachedAudio(request){const active=(await SFOfflineStore.get('kv','active'))?.value;if(!active)return null;if(!audioIndex||audioIndex.user!==active){const map=new Map();for(const t of await SFOfflineStore.all('tracks'))if(t.user===active&&t.state==='complete')for(const url of t.urls||[])map.set(url,t.cache);audioIndex={user:active,map};}const name=audioIndex.map.get(request.url);if(!name)return null;const response=await (await caches.open(name)).match(request.url,{ignoreVary:true});if(!response)return null;
+ const range=request.headers.get('Range');if(!range)return response;const match=/^bytes=(\d+)-(\d*)$/.exec(range);const bytes=await response.arrayBuffer();if(!match)return new Response(null,{status:416,headers:{'Content-Range':'bytes */'+bytes.byteLength}});const start=Number(match[1]),end=match[2]?Math.min(Number(match[2]),bytes.byteLength-1):bytes.byteLength-1;if(start>end||start>=bytes.byteLength)return new Response(null,{status:416,headers:{'Content-Range':'bytes */'+bytes.byteLength}});const headers=new Headers(response.headers);headers.set('Content-Range',`bytes ${start}-${end}/${bytes.byteLength}`);headers.set('Content-Length',String(end-start+1));headers.set('Accept-Ranges','bytes');return new Response(bytes.slice(start,end+1),{status:206,headers});}
+self.addEventListener('fetch',event=>{const u=new URL(event.request.url),base=new URL(self.registration.scope);if(u.origin!==base.origin)return;
+ if(u.pathname.endsWith('/logout.php')){event.respondWith((async()=>{await SFOfflineStore.clear();audioIndex=null;for(const client of await self.clients.matchAll({type:'window',includeUncontrolled:true}))client.postMessage({type:'SF_OFFLINE_CLEARED'});return fetch(event.request);})());return;}
+ if(event.request.method!=='GET')return;
+ const relative=u.pathname.slice(base.pathname.length);
+ if(ASSETS.includes(relative)){event.respondWith((async()=>{const c=await caches.open(SHELL);return await c.match(event.request,{ignoreSearch:true})||fetch(event.request);})());return;}
+ if(u.pathname.endsWith('/stream.php')){event.respondWith((async()=>{let local=null;try{local=await cachedAudio(event.request);}catch(_){}const client=event.clientId?await self.clients.get(event.clientId):null,offlinePage=client&&new URL(client.url).pathname.endsWith('/offline.html');if(local&&(offlinePage||self.navigator.onLine===false))return local;
+  const controller=new AbortController(),timer=local?setTimeout(()=>controller.abort(),4500):null;const cancel=()=>controller.abort();event.request.signal.addEventListener('abort',cancel,{once:true});try{const r=await fetch(event.request,{signal:controller.signal});if(local&&r.status>=500)return local;return r;}catch(e){if(!event.request.signal.aborted&&local)return local;throw e;}finally{if(timer)clearTimeout(timer);event.request.signal.removeEventListener('abort',cancel);}
+ })());return;}
+ if(event.request.mode==='navigate'&&['','index.php','player.php'].includes(relative)){event.respondWith(fetch(event.request).catch(async()=>{const c=await caches.open(SHELL);return await c.match(new URL('offline.html',base).href)||new Response('Sin conexión',{status:503});}));}
+});

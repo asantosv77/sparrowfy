@@ -1,0 +1,12 @@
+services:
+  tunnel:
+    image: cloudflare/cloudflared@sha256:e613aadbc2d9511785d2e67a86b0c8ac18dd63a3f9af0d06faf04cbfdcb35f2d
+    profiles: ["tunel"]
+    command: ["tunnel", "--no-autoupdate", "--url", "http://www:8080"]
+    restart: "no"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on:
+      www:
+        condition: service_healthy

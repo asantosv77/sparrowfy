@@ -1,0 +1,14 @@
+<?php
+if(PHP_SAPI!=='cli'){http_response_code(403);exit;}
+require dirname(__DIR__).'/auth.php';require dirname(__DIR__).'/lib/usage.php';require dirname(__DIR__).'/lib/usage_report.php';
+function check($v,$m){if(!$v)throw new RuntimeException($m);}
+$base=dirname(__DIR__).'/backups/usage-test-'.bin2hex(random_bytes(4));mkdir($base,02770);mkdir($base.'/spool',02770);$db=$base.'/test.sqlite';$p=new PDO('sqlite:'.$db);$p->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);$p->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);sf_usage_schema($p);
+$p->exec('CREATE TABLE users(id TEXT PRIMARY KEY,username TEXT,password_hash TEXT,is_active INTEGER);CREATE TABLE sf_devices(id TEXT PRIMARY KEY,user_id TEXT,revoked_at INTEGER,epoch INTEGER,credential_stamp TEXT);CREATE TABLE sf_device_epochs(user_id TEXT PRIMARY KEY,epoch INTEGER)');
+$p->exec("INSERT INTO users VALUES('u','test','hash',1)");$p->prepare('INSERT INTO sf_devices VALUES(?,?,?,?,?)')->execute(['d','u',null,0,hash('sha256','hash')]);sf_usage_heartbeat($p,'u','d','playing');$r=sf_usage_report($p,'u');check((int)$r['activity']['playing']===1,'Playing presence');$p->exec("UPDATE sf_devices SET revoked_at=1");check((int)sf_usage_report($p,'u')['activity']['users']===0,'Revocation presence');
+check(sf_usage_scope(['id'=>'u','role'=>'user'],'u')==='u','Own scope');try{sf_usage_scope(['id'=>'u','role'=>'user'],'all');throw new LogicException('Scope leaked');}catch(RuntimeException $e){check(!($e instanceof LogicException),'Scope denial');}
+check(sf_usage_scope(['id'=>'a','role'=>'admin'],'all')===null,'Admin scope');
+$now=(new DateTimeImmutable('2024-02-29 23:30:00',new DateTimeZone('America/Mexico_City')))->getTimestamp();$r=sf_usage_report($p,'u',$now);check(count($r['month'])===29,'Leap month');check($r['week'][0]['day']==='2024-02-26','Monday week');check(count($r['bandwidth'])===60,'Bandwidth window');
+$t=(int)floor(time()/60)*60-60;$line=json_encode([$t,'u',6000000,1000,'hls',200])."\n";file_put_contents($base.'/spool/'.$t.'.ndjson',$line);
+$cmd='HLS_MUSIC_LAB_SQLITE_DB='.escapeshellarg($db).' SF_USAGE_TEST_SPOOL='.escapeshellarg($base.'/spool').' php '.escapeshellarg(__DIR__.'/usage_rollup.php');exec($cmd,$o,$code);check($code===0,'Rollup runs');check((int)$p->query('SELECT SUM(downloaded) FROM sf_usage_daily')->fetchColumn()===6000000,'Exact total');
+$id=$p->query('SELECT id FROM sf_usage_batches')->fetchColumn();file_put_contents($base.'/spool/pending/'.$id,$line);exec($cmd,$o,$code);check((int)$p->query('SELECT SUM(downloaded) FROM sf_usage_daily')->fetchColumn()===6000000,'Idempotent retry');$r=sf_usage_report($p,null);check(abs((float)$r['peak_month']['peak_out']*8/60000000-.8)<.0001,'Peak Mbps');
+echo "PASS: ownership, revoked sessions, leap month, week boundaries, rollup totals, retry idempotency, peak Mbps\n";

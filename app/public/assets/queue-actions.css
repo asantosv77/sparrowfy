@@ -1,0 +1,5 @@
+[data-queue-add][hidden],[data-queue-only][hidden],.sf-track-options .sf-track-options-panel button[data-queue-add][hidden]{display:none!important;}
+.sf-collection-queue {display:inline-block;vertical-align:middle;margin:0 8px;}
+.sf-collection-queue summary {font-size:18px;line-height:1;padding:5px 9px;}
+.sf-home-favorites {position:relative;}
+.sf-home-favorites .sf-collection-queue {flex:0 0 auto;}

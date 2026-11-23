@@ -1,0 +1,36 @@
+(()=>{'use strict';
+let promptEvent=null;
+const dialog=document.createElement('dialog');dialog.className='sf-about';dialog.setAttribute('aria-labelledby','sf-about-title');
+dialog.innerHTML=`<div class="sf-about__body"><button class="sf-about__close" aria-label="Cerrar">×</button><div class="sf-about__brand"><img src="assets/sparrowfy-emblem.webp" alt="" width="72" height="72"><div><h2 id="sf-about-title">Acerca de Sparrow-Fy</h2><small>Tu música, bajo tu control.</small></div></div><section class="sf-about__install"><h3>Lleva tu música contigo</h3><p>Instala Sparrow-Fy para abrirla desde tu pantalla de inicio en una ventana propia.</p><small>Requiere conexión a Internet. La instalación no descarga tu biblioteca.</small><button class="btn primary" id="sf-pwa-install" type="button">Instalar Sparrow-Fy</button><p id="sf-pwa-help" role="status"></p></section><h3>Créditos</h3>
+<p><strong>Armando Santos Villalobos</strong><br>Creador e impulsor del proyecto. Dirección funcional, ideas, diseño creativo, investigación, pruebas, auditoría y validación.<br>Copyright © 2026 Armando Santos Villalobos.</p>
+<p><strong>ChatGPT — OpenAI</strong><br>Asistencia principal de desarrollo: arquitectura, programación, integración y depuración.</p>
+<p><strong>DeepSeek y Big Pickle</strong><br>Asistencia complementaria de desarrollo: documentación, investigación, generación y revisión de código.</p>
+<p><strong>Gustavo Santos González</strong><br>Desarrollador de «Sparrowfy para Android», cliente de la API de Sparrow-Fy. Repositorio del APK pendiente de confirmar. Se distribuye bajo su propia licencia MIT.</p>
+<p><strong>Mornye y spotify-charts</strong><br>Servicios externos integrados. Sus licencias y condiciones se detallan en <a href="THIRD_PARTY_LICENSES.md">THIRD_PARTY_LICENSES.md</a>.</p>
+<p>ChatGPT y DeepSeek son herramientas de asistencia de IA. Sus resultados requieren revisión y validación humana. Sparrow-Fy es un proyecto independiente y no implica patrocinio, afiliación ni respaldo de OpenAI, DeepSeek, Google, YouTube, Mornye ni ningún otro servicio mencionado.</p>
+<h3>Licencia</h3>
+<p>El código del servidor y de la webapp se distribuye bajo <a href="LICENSE">Apache License 2.0</a>. La aplicación Android se distribuye bajo su propia licencia MIT. Los créditos anteriores se conservan también en <a href="NOTICE">NOTICE</a>.</p>
+<p>El nombre «Sparrow-Fy» y la identidad visual del proyecto son marcas de Armando Santos Villalobos y no se licencian bajo Apache License 2.0. Cualquier bifurcación o versión modificada deberá identificarse con un nombre distinto y conservar los créditos anteriores.</p>
+<h3>Aviso legal y limitación de responsabilidad</h3>
+<p>Sparrow-Fy es una aplicación en desarrollo continuo. El software se proporciona <strong>«TAL CUAL» (“AS IS”)</strong>, sin garantías de ningún tipo, expresas o implícitas, incluidas las de comerciabilidad, idoneidad para un fin determinado, disponibilidad, seguridad absoluta o ausencia de defectos.</p>
+<p>En la medida permitida por la ley aplicable, los autores, contribuidores y titulares del copyright no serán responsables de daños directos, indirectos, incidentales, consecuenciales o de cualquier otra naturaleza, ni de pérdida de datos, beneficios o uso, derivados del uso o de la imposibilidad de uso del software, incluso si se ha advertido de la posibilidad de dichos daños. El usuario asume los riesgos derivados de su uso.</p>
+<h3>Uso responsable</h3>
+<p>Utiliza únicamente contenido que tengas derecho a almacenar, reproducir o compartir. Según las funciones que actives, tu instalación puede almacenar archivos de audio, generar segmentos HLS y servirlos por streaming bajo demanda.</p>
+<p>El uso de servicios externos, incluidos YouTube, Mornye y spotify-charts, está sujeto a sus condiciones de uso y a la legislación aplicable de tu jurisdicción. Corresponde al usuario cumplir dichas condiciones.</p>
+<p>Sparrow-Fy no está afiliado a Google LLC ni a YouTube, ni cuenta con su patrocinio o respaldo. «YouTube» es una marca registrada de Google LLC.</p>
+<p>Para solicitudes de retirada de contenido (DMCA) u otras cuestiones legales, escribe a <a href="mailto:armando.villalobos@proton.me">armando.villalobos@proton.me</a>.</p>
+<p>Las bibliotecas, herramientas y servicios de terceros conservan sus respectivas licencias, marcas y condiciones de uso. Consulta <a href="THIRD_PARTY_LICENSES.md">THIRD_PARTY_LICENSES.md</a>.</p></div>`;
+document.body.append(dialog);
+const button=dialog.querySelector('#sf-pwa-install'),help=dialog.querySelector('#sf-pwa-help');
+function installed(){return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}
+function update(){button.hidden=installed();help.textContent=installed()?'Sparrow-Fy ya se está ejecutando como aplicación.':promptEvent?'Instalación disponible en este navegador.':/iPhone|iPad|iPod/.test(navigator.userAgent)?'En Safari: Compartir → Añadir a pantalla de inicio.':'Si el navegador no ofrece el diálogo, abre su menú y busca «Instalar aplicación» o «Añadir a pantalla de inicio».';button.textContent=promptEvent?'Instalar Sparrow-Fy':/iPhone|iPad|iPod/.test(navigator.userAgent)?'Cómo añadir a tu pantalla de inicio':'Cómo instalar';if(!promptEvent&&!installed())help.textContent='';}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();promptEvent=e;update();});
+window.addEventListener('appinstalled',()=>{promptEvent=null;update();help.textContent='Sparrow-Fy se instaló correctamente.';button.hidden=true;});
+button.addEventListener('click',async()=>{if(!promptEvent){help.textContent=/iPhone|iPad|iPod/.test(navigator.userAgent)?'1. Abre https://sparrowfy.ddns.info/ en Safari. 2. Pulsa Compartir. 3. Elige Añadir a pantalla de inicio. 4. Si aparece, activa Abrir como app web y pulsa Añadir.':'Abre el menú del navegador y busca Instalar aplicación o Añadir a pantalla de inicio. Si no aparece, prueba con Chrome o Edge.';return;}const event=promptEvent;promptEvent=null;button.disabled=true;try{await event.prompt();const result=await event.userChoice;help.textContent=result.outcome==='accepted'?'Instalación solicitada.':'Puedes instalarla más adelante desde esta ventana.';}catch{help.textContent='Puedes instalarla desde el menú del navegador.';}finally{button.disabled=false;}});
+dialog.querySelector('.sf-about__close').onclick=()=>dialog.close();
+dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+document.addEventListener('click',e=>{if(e.target.closest('[data-about]')){e.preventDefault();update();dialog.showModal();}},true);
+// The login emblem is also keyboard accessible.
+const loginBrand=document.querySelector('h1.sparrow-brand');if(loginBrand){loginBrand.tabIndex=0;loginBrand.setAttribute('role','button');loginBrand.setAttribute('data-about','');loginBrand.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();update();dialog.showModal();}});}
+if('serviceWorker' in navigator&&window.isSecureContext)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).catch(e=>console.warn('PWA registration:',e.message));
+})();

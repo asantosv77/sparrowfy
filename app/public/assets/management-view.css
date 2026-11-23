@@ -1,0 +1,9 @@
+/* Presentation only: server authorization is unchanged. */
+html[data-management-view="0"] .lab-header a[href="create_album.php"],
+html[data-management-view="0"] .lab-header a[href="index.php?view=config"],
+html[data-management-view="0"] .lab-header a[href="admin_users.php"],
+html[data-management-view="0"] .lab-nav a[href="config.php"],
+html[data-management-view="0"] .lab-nav a[href="admin_users.php"],
+html[data-management-view="0"] .nav-new-album-mobile,
+html[data-management-view="0"] #albumCtxMenu,
+html[data-management-view="0"] #component-health-notice { display:none!important; }

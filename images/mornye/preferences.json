@@ -1,0 +1,5 @@
+{
+  "quality": "LOSSLESS",
+  "allow_fallback": false,
+  "services": ["tidal", "deezer", "amazon", "youtube", "soundcloud"]
+}

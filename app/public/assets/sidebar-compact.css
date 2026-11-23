@@ -1,0 +1,15 @@
+/* Compact desktop navigation; keep the existing touch layout on mobile. */
+@media (min-width:721px){
+ .app-shell .lab-nav{padding-top:10px;padding-bottom:10px;gap:3px}
+ .app-shell .lab-nav>a,.app-shell .lab-nav>.theme-menu>summary{padding-top:6px;padding-bottom:6px;min-height:34px}
+ .app-shell .lab-nav>.nav-section-label{padding-top:4px;padding-bottom:3px}
+ .app-shell .lab-nav>.nav-divider{margin-top:7px;margin-bottom:7px}
+ .app-shell .lab-nav>.nav-spacer{min-height:6px}
+ .app-shell .lab-nav>.nav-brand-note{margin-top:6px;padding-top:8px;padding-bottom:6px}
+}
+@media (min-width:721px) and (max-height:760px){
+ .app-shell .lab-nav{padding-top:7px;padding-bottom:7px;gap:2px}
+ .app-shell .lab-nav>a,.app-shell .lab-nav>.theme-menu>summary{padding-top:4px;padding-bottom:4px;min-height:30px}
+ .app-shell .lab-nav>.nav-spacer{min-height:0}
+ .app-shell .lab-nav>.nav-brand-note{margin-top:4px;padding-top:6px;padding-bottom:4px}
+}

@@ -1,0 +1,2 @@
+# Los scripts de mantenimiento solo se ejecutan por CLI, nunca vía HTTP.
+Require all denied

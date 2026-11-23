@@ -1,0 +1,17 @@
+.sf-track-options{position:relative;flex:0 0 auto;order:99;margin-left:6px}
+.sf-track-options summary{list-style:none;cursor:pointer;font-size:22px;padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text)}
+.sf-track-options summary::-webkit-details-marker{display:none}
+.sf-track-options .sf-track-options-panel{position:fixed!important;z-index:1000!important;background:var(--card)!important;border:1px solid var(--border)!important;border-radius:10px!important;padding:6px!important;min-width:180px!important;box-shadow:0 12px 40px #0005!important;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:auto;right:auto!important;color:var(--text)}
+.sf-track-options .sf-track-options-panel button{display:block!important;width:100%!important;box-shadow:none!important;background:transparent!important;border:0!important;color:var(--text)!important;text-align:left!important;padding:10px 12px!important;margin:0!important;border-radius:8px!important;cursor:pointer;font-size:.9rem!important;font-weight:400!important;white-space:nowrap}
+.sf-track-options .sf-track-options-panel button:hover{background:var(--surface-raised)!important}
+.sf-track-options .sf-track-options-panel [data-track-delete],.sf-track-options .sf-track-options-panel [data-detach-track]{color:var(--danger,#fca5a5)!important}
+.sf-property-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px}.sf-property-grid dd{margin:0;overflow-wrap:anywhere}
+/* Fixed menus must not inherit a transformed containing block from the card. */
+.album-card:has(.sf-home-track-menu){transform:none!important}
+.sf-home-track-menu .sf-track-options summary{box-sizing:border-box;width:34px;height:34px;padding:0!important;display:grid;place-items:center;background:var(--card)!important;border:1px solid var(--border)!important;color:var(--text);border-radius:8px;font-size:1.1rem;line-height:1;backdrop-filter:blur(4px)}
+.sf-home-track-menu .sf-track-options summary:hover{background:var(--surface-raised)!important}
+
+.sf-property-grid dt{font-weight:600}
+.sf-home-track-menu{position:absolute;top:8px;right:8px;z-index:5}
+.sf-home-track-menu .sf-track-options{margin:0}
+.sf-recent-grid .album-card:has(.sf-track-options[open]){position:relative;z-index:10}

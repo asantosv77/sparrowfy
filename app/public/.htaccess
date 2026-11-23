@@ -1,0 +1,13 @@
+Options -Indexes
+RewriteEngine On
+# All HLS manifests and segments must pass through the session-checking PHP proxy.
+RewriteRule ^hls_out/(.*)$ stream.php?path=$1 [B,QSA,END]
+# Prevent direct access to common secret/backup/database artifacts under this directory.
+<FilesMatch "(?i)\.(sqlite|sqlite3|db|log|bak|tmp|env)$">
+  Require all denied
+</FilesMatch>
+
+# Block source backups regardless of suffix and temporary diagnostics.
+<FilesMatch "(?i)(\.(bak|backup|old|orig|original|save|tmp)([._-].*)?$|\.php[.~_-]|~$|^session_diag_temp\.php$)">
+  Require all denied
+</FilesMatch>

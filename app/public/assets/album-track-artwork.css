@@ -1,0 +1,13 @@
+/* Optional per-track covers in album management. Off on every page load. */
+.album-tracks-heading{display:flex;align-items:center;flex-wrap:wrap;gap:12px 20px;margin-bottom:12px}
+.album-tracks-heading h2{margin:0}
+.album-artwork-toggle{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;color:var(--muted,#a8b9d2);cursor:pointer}
+.album-artwork-toggle input{margin:0;accent-color:var(--accent,#12bfa4)}
+.album-track-identity{display:flex;align-items:center;gap:10px;min-width:0}
+.album-track-identity strong{min-width:0}
+.album-track-artwork{display:none;position:relative;flex:0 0 40px;width:40px;height:40px;border-radius:6px;overflow:hidden;background:var(--panel,#17313c);color:var(--muted,#a8b9d2);place-items:center}
+.lab-tracks-table.show-track-artwork .album-track-artwork{display:grid}
+.album-track-artwork img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.album-track-artwork img[hidden]{display:none}
+.album-track-origin{white-space:normal;text-decoration:none;font-size:.8rem}
+@media(max-width:600px){.album-track-artwork{flex-basis:32px;width:32px;height:32px}.album-track-identity{gap:7px}}

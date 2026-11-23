@@ -1,0 +1,77 @@
+diff --git a/scripts/sparrowfy_cron.py b/scripts/sparrowfy_cron.py
+index c1f7351..7dfb452 100644
+--- a/scripts/sparrowfy_cron.py
++++ b/scripts/sparrowfy_cron.py
+@@ -2,7 +2,7 @@
+ """Host pi cron dispatcher. Run every minute; fixed commands only, no web input.
+ See deploy/SPARROWFY_CRON.md. --dry-run prints jobs without executing them.
+ """
+-import argparse, datetime, fcntl, json, os, subprocess, sys
++import argparse, datetime, fcntl, json, logging, os, subprocess, sys
+ from pathlib import Path
+ from zoneinfo import ZoneInfo
+ 
+@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parent.parent
+ STATE = ROOT / 'data' / 'cron-control'
+ DOCKER = ['/usr/bin/docker', 'exec', '-u', 'www-data', '-w', '/var/www/html/audio', 'www']
+ JOBS = {
++ 'mornye': [sys.executable, str(Path(__file__).resolve()), '--ensure-mornye'],
+  'processing': DOCKER + ['sh', 'scripts/run_processing_cron.sh'],
+  'usage': DOCKER + ['sh', '-c', 'umask 0007; exec nice -n 10 php scripts/usage_rollup.php'],
+  'resources': ['/usr/bin/python3', str(ROOT / 'scripts/container_memory_monitor.py')],
+@@ -18,6 +19,45 @@ JOBS = {
+  'backup': DOCKER + ['sh', '-c', 'umask 0007; exec nice -n 15 python3 scripts/maintenance.py backup'],
+ }
+ 
++def container_state(name):
++    """Una consulta fallida al daemon no equivale a un contenedor ausente."""
++    listed = subprocess.run(
++        ['/usr/bin/docker', 'container', 'ls', '-a', '--filter', 'name=^/' + name + '$',
++         '--format', '{{.Names}}'],
++        check=True, capture_output=True, text=True, timeout=10)
++    if name not in listed.stdout.splitlines():
++        return 'absent', 'none'
++    inspected = subprocess.run(
++        ['/usr/bin/docker', 'inspect', '--format',
++         '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}', name],
++        check=True, capture_output=True, text=True, timeout=10)
++    state, health = inspected.stdout.strip().split()
++    return state, health
++
++
++def ensure_mornye():
++    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
++    try:
++        web_state, web_health = container_state('www')
++        if web_state != 'running' or web_health in ('starting', 'unhealthy'):
++            logging.info('Se espera al stack principal: www=%s/%s', web_state, web_health)
++            return 0
++        state, health = container_state('mornye-api')
++        if state == 'running' and health in ('healthy', 'starting', 'none'):
++            logging.info('Mornye en ejecución: salud=%s; sin intervención', health)
++            return 0
++        if state not in ('absent', 'exited', 'dead', 'created') and (state, health) != ('running', 'unhealthy'):
++            logging.info('Mornye en estado %s/%s; se conserva el estado actual', state, health)
++            return 0
++        logging.info('Recuperación de Mornye: www disponible; mornye-api=%s/%s', state, health)
++        result = subprocess.run(['bash', str(ROOT.parents[1] / 'mornye-up.sh')], timeout=420)
++        logging.info('mornye-up.sh finalizó con código %d', result.returncode)
++        return result.returncode
++    except (OSError, ValueError, subprocess.SubprocessError) as exc:
++        logging.error('No se completó la comprobación de Mornye: %s', exc)
++        return 1
++
++
+ def backup_due(now, state):
+  if (now.hour, now.minute) < (4, 17): return False
+  if state.get('success_date') == now.date().isoformat(): return False
+@@ -60,7 +100,9 @@ def main():
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument('--task', choices=JOBS)
+  parser.add_argument('--dry-run', action='store_true')
++ parser.add_argument('--ensure-mornye', action='store_true', help=argparse.SUPPRESS)
+  args = parser.parse_args()
++ if args.ensure_mornye: sys.exit(ensure_mornye())
+  os.umask(0o007)
+  if args.dry_run:
+   for name, command in JOBS.items(): print(name + ': ' + json.dumps(command))

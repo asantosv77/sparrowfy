@@ -1,0 +1,6 @@
+* text=auto eol=lf
+propuestas/*.patch -text
+*.zip binary
+*.jpg binary
+*.webp binary
+*.png binary

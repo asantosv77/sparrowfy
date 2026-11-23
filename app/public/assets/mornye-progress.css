@@ -1,0 +1,15 @@
+dialog[data-mornye-progress]{box-sizing:border-box;padding:22px;border-radius:14px}
+dialog[data-mornye-progress]>header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+dialog[data-mornye-progress]>header>div{display:flex;gap:6px;flex-shrink:0}
+dialog[data-mornye-progress] details{position:relative;margin:12px 0;z-index:2}
+dialog[data-mornye-progress] details>ul{position:absolute;left:0;right:0;top:100%;max-height:240px;overflow:auto;margin:6px 0;padding:14px 16px 14px 34px;background:var(--panel,#102630);border:1px solid var(--border,#315563);border-radius:10px;box-shadow:0 8px 24px #0007;overflow-wrap:anywhere}
+dialog[data-mornye-progress] [data-status]{min-height:4.5em;max-height:4.5em;overflow:auto;overflow-wrap:anywhere}
+dialog[data-mornye-progress] [data-node-label],dialog[data-mornye-progress] [data-node-ram]{margin:5px;font-size:.85rem}
+dialog[data-mornye-progress].sf-mornye-mini{position:fixed!important;inset:auto 20px 20px auto!important;width:150px!important;height:150px!important;min-height:0!important;padding:4px!important;margin:0!important;overflow:hidden!important;z-index:2147483000;box-shadow:0 6px 24px #0007}
+dialog[data-mornye-progress].sf-mornye-mini>:not(div[style]):not([data-restore]){display:none!important}
+dialog[data-mornye-progress].sf-mornye-mini>div[style]>:not(svg){display:none!important}
+dialog[data-mornye-progress].sf-mornye-mini svg{width:140px;height:140px}
+dialog[data-mornye-progress].sf-mornye-mini [data-restore]{position:absolute;inset:0;display:block;width:100%;height:100%;background:transparent;border:0;cursor:pointer}
+@media(max-width:500px){dialog[data-mornye-progress]>header h2{font-size:1.1rem}dialog[data-mornye-progress].sf-mornye-mini{right:12px!important;bottom:12px!important}}
+
+dialog[data-mornye-progress].sf-mornye-mini>[data-wait]{display:none!important}

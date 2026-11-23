@@ -1,0 +1,128 @@
+.sf-album-discovery{color:var(--text,#eaf4f6);background:var(--card,#102630);border:1px solid var(--border,#315563);border-radius:16px;width:min(1050px,94vw);max-height:88dvh;box-sizing:border-box;padding:22px;overflow:auto;overscroll-behavior:contain}.sf-album-discovery::backdrop{background:#0009}.sf-album-discovery header{display:flex;align-items:center;justify-content:space-between;gap:16px}.sf-album-discovery header h2{margin:0}.sf-album-fields{display:grid;grid-template-columns:2fr 2fr .7fr 1fr;gap:12px;margin:16px 0}.sf-album-fields input,.sf-album-fields select{display:block;box-sizing:border-box;width:100%;margin-top:5px}.sf-album-release{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border,#315563)}.sf-album-selected{min-height:72px;margin:16px 0}.sf-album-selected img{float:left;width:64px;height:64px;object-fit:cover;margin-right:14px;border-radius:8px}.sf-album-selected h3,.sf-album-selected p{margin:6px 0}.sf-album-tracklist{margin:16px 0}.sf-album-track{display:grid;grid-template-columns:20px minmax(140px,1fr) minmax(140px,1fr) auto;gap:9px;align-items:center;border-bottom:1px solid var(--border,#315563);padding:10px 0}.sf-album-track small{display:block}.sf-album-track>small{grid-column:2/-1}.sf-album-track select{width:100%;min-width:0}.sf-album-discovery footer{position:sticky;bottom:-22px;background:var(--card,#102630);padding:14px 0;display:flex;gap:12px;justify-content:space-between;align-items:center}.sf-album-discovery footer[hidden]{display:none}.sf-album-discovery progress{width:100%;accent-color:#10bfa5}@media(max-width:700px){.sf-album-fields{grid-template-columns:1fr 1fr}.sf-album-track{grid-template-columns:20px minmax(0,1fr) auto}.sf-album-track select{grid-column:2/-1}.sf-album-track button{grid-row:1;grid-column:3}.sf-album-discovery{padding:14px}.sf-album-discovery footer{position:static;flex-wrap:wrap}.sf-album-release{align-items:flex-start}.sf-album-discovery header h2{font-size:1.2rem}}
+.sf-album-fields input,.sf-album-fields select,.sf-album-track select,.sf-album-track .sf-album-name input{background:var(--input-bg,#0a1a23);color:var(--text,#eaf4f6);border:1px solid var(--border,#315563);border-radius:8px;padding:8px 10px;min-height:36px;font:inherit}.sf-album-discovery input:focus-visible,.sf-album-discovery select:focus-visible,.sf-album-discovery button:focus-visible{outline:2px solid var(--accent,#10bfa5);outline-offset:2px}.sf-album-discovery input[type=checkbox]{accent-color:var(--accent,#10bfa5)}
+.sf-album-discovery-inline{width:100%;max-height:none;overflow:visible;border:0;border-radius:0;padding:0;background:transparent}.sf-album-discovery-inline .sf-album-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.sf-album-discovery-inline .sf-album-fields label{min-width:0}.sf-album-discovery-inline header h2{font-size:1.45rem}.sf-album-discovery-inline .sf-album-tracklist{max-height:440px;overflow:auto;overscroll-behavior:contain;padding-right:5px}.sf-album-discovery-inline .sf-album-track{grid-template-columns:20px minmax(0,1fr) auto}.sf-album-discovery-inline .sf-album-track select{grid-column:2/-1}.sf-album-discovery-inline .sf-album-track button{grid-row:1;grid-column:3;font-size:.8rem;padding:6px 8px}.sf-album-discovery-inline footer{position:static;flex-wrap:wrap;gap:12px;padding:12px 0 0;background:transparent}.sf-album-discovery-inline .sf-album-release{flex-wrap:wrap}.sf-album-discovery-inline header{margin:20px 0}.sf-album-discovery-inline footer label{display:inline-flex;align-items:center;gap:7px}
+.sf-album-discovery-inline [data-close]{display:none!important}
+.sf-album-discovery [data-destination]{border:1px solid var(--border,#315563);border-radius:12px;padding:12px 14px;margin:14px 0;display:grid;gap:8px}
+.sf-album-discovery [data-destination][hidden]{display:none}
+.sf-album-discovery [data-destination] legend{padding:0 6px;font-weight:600}
+.sf-album-discovery [data-destination] label{display:flex;align-items:center;gap:8px;cursor:pointer}
+.sf-album-discovery [data-destination] input{accent-color:var(--accent,#10bfa5)}
+.sf-album-discovery [data-destination-note]{margin:8px 0 0}
+.sf-album-track .sf-album-name{grid-column:2/-1;font-size:.82rem;color:var(--muted,#9fb6bf)}
+.sf-album-track .sf-album-name input{display:block;width:100%;margin-top:4px}
+
+/* Espera sobre el botón que aún no debe pulsarse */
+.sf-btn-skeleton,.sf-btn-skeleton:disabled{position:relative;overflow:hidden;pointer-events:none;cursor:progress;transition:none!important;background:linear-gradient(105deg,var(--surface-raised,#e5edf2) 25%,var(--border,#cbd7df) 45%,var(--surface-raised,#e5edf2) 65%)!important;background-size:260% 100%!important;animation:sf-btn-shimmer 1.2s linear infinite!important;border-color:var(--border,#cbd7df)!important;color:var(--muted,#5c6f7d)!important;box-shadow:none!important}
+.sf-btn-skeleton::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.5) 50%,transparent 70%);background-size:260% 100%;animation:sf-btn-shimmer 1.2s linear infinite;pointer-events:none}
+@keyframes sf-btn-shimmer{0%{background-position:130% 0}100%{background-position:-130% 0}}
+@media (prefers-reduced-motion:reduce){.sf-btn-skeleton,.sf-btn-skeleton::after{animation:none!important;background:var(--surface-raised,#e5edf2)!important}}
+
+/* Fila que acaba de aparecer durante una importación */
+@keyframes sf-row-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.lab-tracks-table tr.yt-row-new{animation:sf-row-in .35s ease-out}
+.lab-tracks-table tr.yt-row-new td{background:rgba(16,185,129,.10)}
+@media (prefers-reduced-motion:reduce){.lab-tracks-table tr.yt-row-new{animation:none}}
+
+/* Espera central al crear el álbum y preparar las pistas */
+.sf-page-wait{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:20px;box-sizing:border-box;background:rgba(3,12,18,.55);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);overscroll-behavior:contain;touch-action:none;animation:sf-page-wait-in .16s ease-out}
+.sf-page-wait__card{width:min(340px,86vw);box-sizing:border-box;padding:22px;display:grid;gap:12px;border:1px solid var(--border,#315563);border-radius:16px;background:var(--card,#102630);color:var(--text,#eaf4f6);box-shadow:0 24px 70px #0007}
+.sf-page-wait__label{margin:0 0 4px;text-align:center;font-weight:600}
+.sf-page-wait__bar{display:block;height:14px;border-radius:999px;background:linear-gradient(105deg,var(--surface-raised,#1a3440) 25%,var(--border,#315563) 45%,var(--surface-raised,#1a3440) 65%);background-size:260% 100%;animation:sf-btn-shimmer 1.2s linear infinite}
+.sf-page-wait__bar--title{height:18px;width:58%}
+.sf-page-wait__bar--short{width:68%}
+.sf-page-wait__hint{margin:2px 0 0;text-align:center;font-size:.78rem;color:var(--muted,#9fb6bf)}
+@keyframes sf-page-wait-in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.sf-page-wait{animation:none}.sf-page-wait__bar{animation:none!important;background:var(--surface-raised,#1a3440)}}
+
+/* Keep the selection column stable while each source is being resolved. */
+.sf-album-source-slot{display:grid;place-items:center;width:20px;min-height:20px}
+.sf-album-source-slot input{margin:0}
+.sf-album-source-slot [hidden]{display:none!important}
+.sf-album-source-skeleton{display:block;width:16px;height:16px;border-radius:4px;background:linear-gradient(105deg,var(--surface-raised,#1a3440) 25%,var(--border,#315563) 45%,var(--surface-raised,#1a3440) 65%);background-size:260% 100%;animation:sf-btn-shimmer 1.2s linear infinite}
+@media(prefers-reduced-motion:reduce){.sf-album-source-skeleton{animation:none}}
+
+/* Wide review dialogs: only the dialog scrolls, never the song list inside it. */
+dialog.sf-album-discovery,.sf-youtube-review{width:min(1600px,96vw);max-width:96vw;max-height:92dvh;overflow:auto;overscroll-behavior:contain;box-sizing:border-box}
+dialog.sf-album-discovery .sf-album-tracklist{max-height:none!important;overflow:visible!important}
+dialog.sf-album-discovery .sf-album-track{grid-template-columns:20px minmax(170px,1.1fr) minmax(240px,1.4fr) minmax(210px,1.3fr) 112px}
+dialog.sf-album-discovery .sf-album-track-title{min-width:0;grid-column:2}
+dialog.sf-album-discovery .sf-album-track-title>strong,dialog.sf-album-discovery .sf-album-track-title>small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+dialog.sf-album-discovery .sf-album-track>select{grid-column:3;grid-row:1}
+dialog.sf-album-discovery .sf-album-name{grid-column:4;grid-row:1;margin:0;min-width:0}
+dialog.sf-album-discovery .sf-album-field-caption{display:none}
+dialog.sf-album-discovery .sf-album-track>button{grid-column:5;grid-row:1}
+.sf-youtube-review{border:1px solid var(--border,#315563);border-radius:16px;padding:22px;background:var(--card,#102630);color:var(--text,#eaf4f6)}
+.sf-youtube-review::backdrop{background:#0009}
+.sf-youtube-review>header{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.sf-youtube-review h2{margin:0;font-size:1.3rem}
+.sf-youtube-review>footer{display:flex;justify-content:flex-end;position:sticky;bottom:-22px;padding:16px 0;background:var(--card,#102630)}
+.sf-youtube-review-head,.sf-youtube-review .youtube-track-row{display:grid;grid-template-columns:20px minmax(200px,1.25fr) minmax(240px,1.1fr) minmax(260px,1.35fr);gap:12px;align-items:center}
+.sf-youtube-review-head{padding:12px 0;color:var(--muted,#9fb6bf);font-size:.8rem;border-bottom:1px solid var(--border,#315563)}
+.sf-youtube-review .youtube-track-row{padding:12px 0;border-bottom:1px solid var(--border,#315563)}
+.sf-youtube-review #ytResults{max-height:none!important;overflow:visible!important}
+.sf-youtube-review label{margin:0;min-width:0}.sf-youtube-review select,.sf-youtube-review input[type=text]{width:100%;min-width:0;box-sizing:border-box;margin:0;height:36px}
+.yt-row-identity{min-width:0}.yt-row-identity strong,.yt-row-identity small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.yt-row-identity small{margin-top:4px;font-size:.8rem}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini){position:fixed;right:20px;bottom:20px;z-index:200000;width:min(560px,calc(100vw - 40px));max-height:86dvh;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;padding:22px;box-sizing:border-box;box-shadow:0 20px 55px #0006}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>h2{order:0;padding-right:40px}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini) .progress-ring-wrap{order:1;flex:none}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>p{order:2}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini) .container-memory{position:static!important;float:none;width:100%;max-width:none;box-sizing:border-box;order:4;margin:12px 0 0}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>ul{order:5}
+@media(max-width:1000px){dialog.sf-album-discovery .sf-album-track{grid-template-columns:20px minmax(0,1fr) 112px}dialog.sf-album-discovery .sf-album-track>button{grid-column:3}dialog.sf-album-discovery .sf-album-track>select{grid-column:2/-1;grid-row:2}dialog.sf-album-discovery .sf-album-name{grid-column:2/-1;grid-row:3}.sf-youtube-review-head{display:none}.sf-youtube-review .youtube-track-row{grid-template-columns:20px minmax(0,1fr)}.sf-youtube-review .yt-quality-label,.sf-youtube-review .yt-name-label{grid-column:2}.sf-youtube-review select,.sf-youtube-review input[type=text]{font-size:16px}}
+
+#progressPanel.sf-import-progress-float[hidden]{display:none!important}
+
+dialog.sf-album-discovery .sf-album-track-labels{display:grid;grid-template-columns:20px minmax(170px,1.1fr) minmax(240px,1.4fr) minmax(210px,1.3fr) 112px;gap:9px;padding:12px 0 6px;color:var(--muted,#9fb6bf);font-size:.8rem}
+@media(max-width:1000px){dialog.sf-album-discovery .sf-album-track-labels{display:none}}
+
+/* Floating import progress stacks resources below: no desktop side reserve. */
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>h2,
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>#progressTrackName,
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>#progressDetail{width:100%;max-width:100%;margin-left:0;margin-right:0;box-sizing:border-box;text-align:center}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-ring-wrap{width:min(220px,100%);max-width:100%;height:auto;margin:12px auto}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-ring-wrap svg{width:100%;height:auto}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini) .dual-progress-label{width:100%;justify-content:center}
+
+#progressPanel .progress-close{position:absolute;right:52px;top:10px;z-index:3;padding:4px 10px;min-height:0;line-height:1.1}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>h2{padding-left:0;padding-right:0;margin-top:30px}
+#progressPanel.progress-panel-fading{opacity:0;transition:opacity .4s ease;pointer-events:none}
+@media(prefers-reduced-motion:reduce){#progressPanel.progress-panel-fading{transition:none}}
+
+.progress-reopen{position:sticky;top:8px;z-index:6;margin:0 0 12px}.progress-reopen[hidden]{display:none}
+
+/* CPU remains inside SVG; batch/song captions belong only to expanded mode. */
+#progressPanel.progress-panel-mini .dual-progress-label{display:none!important}
+
+#progressPanel>.progress-results{width:100%;box-sizing:border-box;margin:0 0 14px;border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:left}
+#progressPanel>.progress-results summary{cursor:pointer;font-weight:600;color:var(--text)}
+#progressPanel>.progress-results .progress-log{width:100%;max-height:none;overflow:visible;box-sizing:border-box;margin:10px 0 0;padding-left:20px;text-align:left}
+#progressPanel>.progress-results .progress-log li{overflow-wrap:anywhere}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-results{order:1}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-ring-wrap{order:2}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>p{order:3}
+#progressPanel[data-progress-outcome="error"]>.progress-results{border-color:var(--danger,#f87171)}
+
+/* The expanded log overlays the ring; only the summary occupies layout space. */
+#progressPanel>.progress-results{position:relative;z-index:5}
+#progressPanel>.progress-results>.progress-log{position:absolute;top:calc(100% + 6px);left:0;right:0;width:auto;margin:0;max-height:min(320px,40dvh);overflow:auto;overscroll-behavior:contain;box-sizing:border-box;padding:12px 14px 12px 32px;border:1px solid var(--border);border-radius:10px;background:var(--card,#102630);color:var(--text);box-shadow:0 14px 30px #0006;z-index:6}
+#progressPanel>.progress-results>.progress-log:empty:before{content:'Aún no hay pistas procesadas.';color:var(--muted)}
+#progressPanel>.progress-results>.progress-log:focus-visible{outline:2px solid var(--primary);outline-offset:-3px}
+
+/* Compact expanded progress; stable text slots prevent state/title height jumps. */
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini){padding:16px}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>h2{font-size:18px;line-height:1.3;margin:28px 0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-results{padding:8px 10px;margin-bottom:8px}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-results summary{font-size:13px;line-height:1.35}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-results>.progress-log{font-size:12px;line-height:1.45}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-results>.progress-log li{margin:4px 0}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-ring-wrap{margin:8px auto}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini) .dual-progress-label small{font-size:10px}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini) .dual-progress-label b{font-size:13px}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>#progressTrackName{font-size:13px;line-height:1.5;height:1.5em;min-height:1.5em;margin:6px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>#progressTrackName[hidden]{display:block!important;visibility:hidden}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>#progressDetail{font-size:12px;line-height:1.4;min-height:2.8em;max-height:2.8em;margin:2px 0 6px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+#progressPanel.sf-import-progress-float:not(.progress-panel-mini) .container-memory{margin-top:8px}
+@media(max-height:800px){#progressPanel.sf-import-progress-float:not(.progress-panel-mini)>.progress-ring-wrap{width:min(180px,100%)}}
+
+.sf-album-submit-status{margin:8px 0 0;max-width:650px;font-size:.88rem;line-height:1.45;color:var(--text,#eaf4f6)}
+.sf-album-submit-status:empty{display:none}

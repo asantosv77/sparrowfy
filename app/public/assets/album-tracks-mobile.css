@@ -1,0 +1,60 @@
+/* Track management: allow readable names and touch controls on phones.
+   Desktop keeps its existing table; dynamic imports use the same classes. */
+@media (max-width: 760px) {
+  .lab-tracks-card .lab-tracks-scroll { overflow: visible; min-width: 0; }
+  .lab-tracks-table, .lab-tracks-table tbody { display: block; width: 100%; }
+  .lab-tracks-table thead { display: none; }
+  .lab-tracks-table tr {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 4px 8px;
+    width: 100%;
+    margin: 0 0 10px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .lab-tracks-table td { min-width: 0; padding: 0; border: 0; }
+  .lab-tracks-table .lab-track-number {
+    grid-column: 1; grid-row: 1; align-self: start; padding-top: 2px;
+  }
+  .lab-tracks-table .lab-track-name { grid-column: 2; grid-row: 1; }
+  .lab-tracks-table .album-track-identity { align-items: flex-start; }
+  .lab-tracks-table .lab-track-name strong {
+    white-space: normal; overflow-wrap: anywhere; line-height: 1.4;
+  }
+  .lab-tracks-table .lab-track-quality {
+    grid-column: 2; grid-row: 2; display: flex; flex-wrap: wrap;
+    align-items: baseline; gap: 4px 8px; color: var(--muted);
+    font-size: .8rem;
+  }
+  .lab-tracks-table .lab-track-quality small { margin: 0; }
+  .lab-tracks-table .lab-track-actions {
+    grid-column: 1 / -1; grid-row: 3; padding-top: 8px;
+  }
+  .lab-tracks-table .lab-track-buttons {
+    width: 100%; max-width: none; gap: 7px;
+    justify-content: flex-start; flex-wrap: wrap;
+  }
+  .lab-tracks-table .lab-icon-btn {
+    flex: 1 1 70px; min-height: 44px; padding: 7px 6px;
+    font-size: .7rem; box-sizing: border-box;
+  }
+  .lab-tracks-table .lab-icon-btn span { display: block; white-space: normal; }
+  .lab-tracks-table .lab-btn-play { flex: 0 0 44px; }
+  .lab-tracks-table .sf-track-options { order: 5; margin-left: auto; flex: 0 0 auto; }
+  .lab-tracks-table .sf-track-options > summary {
+    min-width: 44px; min-height: 44px; padding: 7px;
+    box-sizing: border-box; display: grid; place-items: center;
+  }
+  .lab-tracks-table .sf-track-options-panel {
+    right: 0; left: auto; max-width: calc(100vw - 64px); box-sizing: border-box;
+  }
+  .lab-tracks-table .album-track-origin {
+    flex: 1 1 145px; min-width: 0; min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center;
+    white-space: normal; text-align: center; box-sizing: border-box;
+  }
+  .lab-tracks-table .lab-track-buttons > .muted {
+    flex: 1 1 110px; font-size: .75rem; overflow-wrap: anywhere;
+  }
+}

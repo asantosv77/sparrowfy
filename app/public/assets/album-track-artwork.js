@@ -1,0 +1,10 @@
+/* Optional artwork lookup: strict matches only, sequential and time bounded.
+ * This view never writes metadata. Missing/failed matches stay blank.
+ */
+(()=>{'use strict';const toggle=document.getElementById('showTrackArtwork'),table=document.getElementById('albumTracksTable');if(!toggle||!table)return;
+let running=false;const attempted=new Set();
+const attach=(host,url)=>{if(!url)return;const img=document.createElement('img');img.alt='';img.loading='lazy';img.decoding='async';img.referrerPolicy='no-referrer';img.addEventListener('error',()=>img.remove(),{once:true});img.src=url;host.append(img);};
+async function lookup(){if(running)return;running=true;try{for(const row of table.querySelectorAll('[data-artwork-track]')){if(!toggle.checked)break;const id=row.dataset.artworkTrack,host=row.querySelector('.album-track-artwork');if(!host||host.querySelector('img')||attempted.has(id))continue;attempted.add(id);const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);try{const r=await fetch('api_album_track_artwork.php',{method:'POST',headers:{'X-CSRF-Token':document.querySelector('meta[name="sf-csrf"]')?.content||'','Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({track_id:id}),signal:controller.signal});if(!r.ok)continue;const d=await r.json();if(d.unavailable)break;if(d.cover){const u=new URL(d.cover);if(u.protocol==='https:'&&/(^|\.)mzstatic\.com$/i.test(u.hostname))attach(host,u.href);}}catch(_){break;}finally{clearTimeout(timer);}}}finally{running=false;}}
+const apply=()=>{table.classList.toggle('show-track-artwork',toggle.checked);if(!toggle.checked)return;table.querySelectorAll('img[data-artwork-src]').forEach(img=>{img.addEventListener('error',()=>img.remove(),{once:true});img.src=img.dataset.artworkSrc;delete img.dataset.artworkSrc;});lookup();};
+toggle.checked=false;apply();toggle.addEventListener('change',apply);window.addEventListener('pageshow',e=>{if(e.persisted){toggle.checked=false;apply();}});
+})();

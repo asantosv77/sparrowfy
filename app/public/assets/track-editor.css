@@ -1,0 +1,40 @@
+
+.track-editor-body{margin:0;padding:22px;background:var(--bg);color:var(--text)}
+.track-editor-wrap{max-width:1120px;margin:auto;font:14px/1.45 system-ui,sans-serif}
+.editor-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
+.editor-heading h1{font-size:1.6rem;margin:2px 0 4px;letter-spacing:-.025em}
+.editor-heading p{margin:0}.editor-eyebrow{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--primary)}
+.editor-section{border:1px solid var(--border);border-radius:14px;padding:18px;background:var(--card);margin-bottom:14px;min-width:0}
+.editor-section h2{display:flex;align-items:center;gap:8px;font-size:1.03rem;margin:0 0 14px}
+.metadata-fields{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) 84px;gap:12px 16px}
+.editor-field{display:flex;flex-direction:column;gap:5px;margin:0;font-weight:600;min-width:0}
+.editor-field>span{font-size:.85rem;color:var(--muted)}
+.field-name,.field-title,.field-album{grid-column:span 2}.field-artist{grid-column:span 3}.field-genre{grid-column:span 2}.field-year{grid-column:span 1}
+.track-editor-wrap .editor-field input{width:100%;max-width:100%;min-height:39px;box-sizing:border-box;margin:0;padding:8px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font:inherit;transition:border-color .15s}
+.editor-field input:focus{outline:2px solid var(--primary);outline-offset:1px}
+.editor-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:16px;align-items:stretch}
+.editor-columns>.editor-section{margin-bottom:0}.editor-note{font-size:.8rem;line-height:1.5;color:var(--muted);margin:9px 0}
+.editor-cover-row{display:flex;align-items:center;gap:16px;padding:4px 0 15px}
+.editor-artwork{width:98px;height:98px;flex:none;position:relative;display:grid;place-items:center;border:1px solid var(--border);border-radius:12px;background:var(--bg);overflow:hidden}
+.editor-artwork>span{font-size:32px;color:var(--muted)}.editor-artwork img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}.editor-artwork img[hidden]{display:none}
+.editor-cover-actions{display:flex;gap:8px;flex-wrap:wrap;min-width:0}.editor-cover-actions .btn{font-size:.8rem;padding:7px 10px}
+.editor-acoustid{border-top:1px solid var(--border);padding-top:15px}.editor-acoustid [role=status]{font-size:.82rem}
+#identifyResults{max-height:160px;overflow:auto}#identifyResults p{margin:6px 0}#identifyResults button{border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);padding:8px;width:100%;text-align:left;cursor:pointer}
+.editor-audio-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#trackAudioEditProgress{width:100%;height:9px;accent-color:var(--primary)}#trackAudioEditProgress[hidden]{display:none}
+#trackAudioEditStatus{font-size:.82rem;overflow-wrap:anywhere}#trackAudioEditStatus:empty{display:none}
+.editor-footer{position:sticky;bottom:-22px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:15px 0;margin-top:12px;background:var(--bg);border-top:1px solid var(--border);z-index:5}
+.editor-footer .editor-note{flex:1;min-width:160px;margin:0}.editor-help{display:inline-grid;place-items:center;width:21px;height:21px;flex:none;padding:0;border:1px solid var(--border);border-radius:50%;background:var(--bg);color:var(--muted);font-size:12px;cursor:help}
+.editor-help:focus-visible{outline:2px solid var(--primary)}.editor-tooltip{position:fixed;z-index:100;width:max-content;max-width:min(340px,calc(100vw - 24px));padding:11px 13px;border:1px solid var(--primary);border-radius:10px;background:var(--card);color:var(--text);font-size:13px;line-height:1.5;box-shadow:0 10px 35px #0007;pointer-events:none}
+.editor-tooltip[hidden]{display:none}.editor-alert{padding:12px;border:1px solid color-mix(in srgb, var(--danger,#c55) 55%, transparent);border-radius:9px;background:color-mix(in srgb, var(--danger,#c55) 14%, transparent);color:var(--text)}
+.metadata-mini-player[hidden]{display:none}.metadata-mini-player{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);margin:12px 0}
+.metadata-mini-player strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.metadata-mini-player>input{grid-column:1/-1;width:100%;accent-color:var(--primary)}.metadata-mini-player>label{grid-column:1/-1;display:flex;gap:8px;align-items:center;margin:0}.metadata-mini-player label input{width:120px}#metadataPreviewStatus:empty{display:none}
+#coverPickerDialog{width:min(760px,94vw);max-height:85dvh;overflow:auto;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text)}#coverPickerDialog::backdrop{background:#0009}#coverPickerDialog header{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:-18px;background:var(--card);padding:9px 0;z-index:2}#coverPickerDialog h2{font-size:1.05rem;margin:0}#covers{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:12px}#covers button{padding:7px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);cursor:pointer}#covers img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:5px}#covers span{display:block;font-size:.8rem;overflow-wrap:anywhere;margin-top:5px}
+@media(max-width:700px){.track-editor-body{padding:14px}.editor-heading{gap:10px}.editor-heading h1{font-size:1.3rem}.editor-heading .muted{font-size:.8rem}.editor-section{padding:13px}.editor-columns{grid-template-columns:minmax(0,1fr);gap:12px}.metadata-fields{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}.field-name{grid-column:span 6}.editor-footer{bottom:-14px}.field-title,.field-album{grid-column:span 3}.field-artist{grid-column:span 6}.field-genre{grid-column:span 4}.field-year{grid-column:span 2}.editor-footer .editor-note{flex-basis:100%;font-size:.72rem}}
+@media(max-width:380px){.field-title,.field-album{grid-column:span 6}.editor-audio-fields{gap:8px}.editor-field input{font-size:16px}.editor-section h2{font-size:.95rem}.editor-cover-row{gap:10px}}
+
+/* Preserve the loose-track editor's original field order and cover workflow. */
+.track-editor-wrap{max-width:1040px}.editor-heading h1{font-size:1.4rem}
+.editor-visible-name{margin-top:13px;border-top:1px solid var(--border);padding-top:11px}
+.editor-visible-name summary{cursor:pointer;color:var(--muted);font-size:.82rem}.editor-visible-name .editor-field{margin-top:9px}
+.editor-acoustid{border-top:0;padding-top:0;padding-bottom:14px}.editor-cover-row{border-top:1px solid var(--border);padding:15px 0 0}

@@ -1,0 +1,8 @@
+.album-order-handle {display:inline-flex;align-items:center;justify-content:center;flex:0 0 28px;width:28px;height:36px;padding:3px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);cursor:grab;touch-action:none;user-select:none;}
+.album-order-handle[hidden] {display:none!important;}
+.album-order-handle svg {width:20px;height:24px;fill:currentColor;pointer-events:none;}
+.album-order-handle:focus-visible {outline:2px solid var(--primary);outline-offset:2px;}
+.album-order-handle:active {cursor:grabbing;}
+.album-order-moving {background:var(--card,#102630);outline:2px solid var(--primary);opacity:.8;}
+#albumOrderStatus {font-size:.8rem;}
+@media(max-width:760px){.album-order-handle {flex-basis:36px;width:36px;min-height:44px;}.album-tracks-heading {flex-wrap:wrap;}#albumOrderStatus {flex-basis:100%;}}

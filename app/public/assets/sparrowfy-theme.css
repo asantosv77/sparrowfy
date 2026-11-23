@@ -1,0 +1,168 @@
+/* Sparrow-Fy visual layer: presentation-only overrides; no playback/auth logic.
+   Todos los colores salen de las variables del tema activo para que el
+   reproductor (ventana, incrustado y mini) respete la selección del usuario. */
+:root {
+  --sf-glass: color-mix(in srgb, var(--card) 88%, transparent);
+  --sf-shadow: 0 18px 48px rgba(0,0,0,.24);
+}
+html { min-height: 100%; background: var(--bg); }
+body {
+  background:
+    radial-gradient(ellipse at 8% -10%, color-mix(in srgb, var(--primary) 13%, transparent), transparent 36rem),
+    radial-gradient(ellipse at 94% 10%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 30rem),
+    var(--bg);
+  color: var(--text);
+}
+a { color: var(--primary); }
+a:hover { color: var(--accent); }
+.lab-header, .lab-nav, .lab-main, .admin-wrap {
+  width: min(1680px, calc(100% - 48px));
+  max-width: 1680px;
+}
+.lab-header {
+  position: relative;
+  padding: 18px 0 16px;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.lab-header > div:first-child { min-width: 210px; }
+.lab-header h1 { font-size: 1.18rem; }
+.lab-header .muted { margin: 5px 0 0; font-size: .82rem; }
+.sparrow-brand { gap: 11px; }
+.sparrow-brand__logo {
+  width: 44px; height: 44px; border: 1px solid var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 8%, transparent), 0 5px 20px rgba(0,0,0,.22);
+}
+.sparrow-brand__text strong { color: var(--accent); letter-spacing: .075em; text-transform: uppercase; }
+.sparrow-brand__text small { letter-spacing: .07em; }
+.header-actions { align-items: center; gap: 9px; }
+.header-actions form { display: inline-flex !important; }
+.btn {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface-raised), var(--card));
+  color: var(--text);
+  border-radius: 10px;
+  padding: .62rem .95rem;
+  font-weight: 650;
+  transition: transform .16s ease, border-color .16s ease, filter .16s ease, box-shadow .16s ease;
+}
+.btn:hover { filter: brightness(1.12); border-color: var(--primary); transform: translateY(-1px); }
+.btn.primary {
+  color: var(--on-primary, #021b17);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dim));
+  border-color: var(--primary-dim);
+  box-shadow: 0 5px 18px color-mix(in srgb, var(--primary) 16%, transparent);
+}
+.lab-nav {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 7px;
+  padding: 10px 0 12px; border-bottom: 1px solid var(--border);
+}
+.lab-nav a {
+  border: 1px solid transparent; border-radius: 9px; padding: 9px 13px;
+  font-size: .88rem; color: var(--muted); transition: background .15s ease, color .15s ease;
+}
+.lab-nav a.active, .lab-nav a:hover {
+  color: var(--text); border-bottom-color: transparent;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
+}
+.lab-main { padding: 22px 0 48px; }
+.card, .album-card, .lab-dialog, .modal-card {
+  background: linear-gradient(145deg, var(--card), var(--bg));
+  border-color: var(--border);
+  box-shadow: var(--sf-shadow);
+}
+.card { border-radius: 16px; padding: clamp(16px, 2vw, 26px); }
+.card h2, .card h3 { letter-spacing: -.015em; }
+.muted, .muted-card { color: var(--muted); }
+input[type=text], input[type=number], input[type=search], input[type=password], input:not([type]), textarea, select {
+  background: var(--input-bg, var(--card)); color: var(--text); border: 1px solid var(--border);
+  border-radius: 9px; padding: 10px 12px; max-width: 100%; color-scheme: inherit;
+}
+input:focus, textarea:focus, select:focus, button:focus-visible, a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 70%, transparent); outline-offset: 2px;
+}
+input[type=range] { accent-color: var(--primary); }
+.album-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 17px; }
+.album-card {
+  padding: 11px; border-radius: 15px; gap: 9px; overflow: hidden;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.album-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 20px 42px rgba(0,0,0,.2); }
+.album-cover { border-radius: 10px; background-color: var(--surface-raised); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 7%, transparent); }
+.album-cover::after { content: ""; position: absolute; inset: 45% 0 0; pointer-events: none; background: linear-gradient(transparent, color-mix(in srgb, #000 15%, transparent)); }
+.play-badge { background: var(--primary); color: var(--on-primary, #03221b); opacity: .94; }
+.album-card-title { line-height: 1.35; }
+.library-search { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; padding: 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface-raised); }
+.library-search input[type=search] { flex: 1 1 300px; min-width: 0; margin: 0; }
+.empty-search { border: 1px dashed var(--border); border-radius: 12px; padding: 20px; color: var(--muted); }
+.highlight-card { border-color: var(--primary); box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 22%, transparent), var(--sf-shadow); }
+code, pre { background: var(--surface-raised); border-color: var(--border); color: var(--text); }
+.banner.ok { background: color-mix(in srgb, var(--primary) 18%, transparent); color: var(--text); border: 1px solid color-mix(in srgb, var(--primary) 32%, transparent); }
+.banner.err { background: color-mix(in srgb, var(--danger, #f87171) 18%, transparent); color: var(--danger, #f87171); border: 1px solid color-mix(in srgb, var(--danger, #f87171) 32%, transparent); }
+.ctx-menu { background: var(--card); border-color: var(--border); box-shadow: 0 18px 50px #0007; }
+.ctx-menu button:hover { background: var(--surface-raised); }
+.modal-overlay { backdrop-filter: blur(7px); }
+.modal-card { border-radius: 17px; }
+/* Login and account screens */
+.auth-wrap { background: radial-gradient(ellipse at 50% 20%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 34rem); }
+.auth-card { width: min(100%, 460px); padding: clamp(24px, 4vw, 38px); border-radius: 22px; }
+.auth-card .sparrow-brand { margin-bottom: 20px; }
+.auth-card .sparrow-brand__logo { width: 58px; height: 58px; }
+.auth-card .sparrow-brand__text strong { font-size: 1.08rem; }
+.auth-card form button { min-height: 46px; }
+.auth-error { background: color-mix(in srgb, var(--danger, #f87171) 20%, transparent); color: var(--danger, #f87171); border: 1px solid color-mix(in srgb, var(--danger, #f87171) 34%, transparent); }
+/* Player window uses the same brand language as the active theme. */
+.player-body { background: radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--primary) 11%, transparent), transparent 34rem), var(--bg); }
+.music-player { background: linear-gradient(150deg, var(--card), var(--bg)); border-color: var(--border); box-shadow: 0 28px 80px rgba(0,0,0,.3); }
+.player-cover, .playlist, .lyrics-box, .quality-select { border-color: var(--border); background-color: var(--card); }
+.playlist li.is-selected, .playlist li.is-playing { background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--text); box-shadow: inset 3px 0 0 var(--primary); }
+.btn-round { background: linear-gradient(135deg, var(--primary), var(--primary-dim)) !important; color: var(--on-primary, #02251e) !important; box-shadow: 0 7px 22px color-mix(in srgb, var(--primary) 24%, transparent); }
+.progress-bar { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+.back-link { border: 1px solid var(--border); background: color-mix(in srgb, var(--card) 82%, transparent); border-radius: 999px; padding: 8px 12px; }
+@media (min-width: 1000px) {
+  .lab-header { min-height: 82px; }
+  .lab-main > .card { margin-bottom: 20px; }
+  .album-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+}
+@media (max-width: 760px) {
+  .lab-header, .lab-nav, .lab-main, .admin-wrap { width: calc(100% - 28px); }
+  .lab-header { align-items: flex-start; padding-top: 14px; }
+  .header-actions { width: 100%; }
+  .header-actions .btn { flex: 1 1 auto; }
+  .lab-nav { gap: 5px; }
+  .lab-nav a { flex: 1 1 auto; text-align: center; padding: 9px 8px; }
+  .lab-main { padding-top: 15px; }
+  .album-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 11px; }
+  .album-card { padding: 8px; }
+}
+@media (max-width: 420px) {
+  .lab-header, .lab-nav, .lab-main, .admin-wrap { width: calc(100% - 20px); }
+  .sparrow-brand__logo { width: 39px; height: 39px; }
+  .header-actions .btn { font-size: .8rem; padding: .55rem .65rem; }
+  .album-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+/* Compact library search in the application header. */
+.header-search {
+  display: flex; align-items: center; gap: 8px; flex: 1 1 270px; min-width: 180px;
+  max-width: 470px; padding: 4px 5px 4px 12px; margin: 0;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--surface-raised); color: var(--muted);
+}
+.header-search > span { font-size: 1.35rem; line-height: 1; }
+.header-search input[type=search] {
+  flex: 1 1 auto; min-width: 0; width: 100%; margin: 0; padding: 7px 0;
+  border: 0; outline: 0; box-shadow: none; background: transparent; font-size: .85rem;
+}
+.header-search input[type=search]:focus { outline: 0; }
+.header-search button {
+  flex: none; border: 0; border-radius: 8px; padding: 7px 10px;
+  color: var(--on-primary, #03241d); background: var(--primary); font-weight: 700; cursor: pointer;
+}
+@media (max-width: 760px) {
+  .header-search { flex: 1 1 100%; max-width: none; order: 2; }
+  .header-actions { order: 3; }
+}

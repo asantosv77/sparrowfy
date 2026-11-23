@@ -1,0 +1,3 @@
+services:
+  www:
+    platform: linux/amd64

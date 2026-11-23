@@ -1,0 +1,19 @@
+/* Explicit controls avoid platform emoji and native iOS ornamentation. */
+.sf-media-icon{display:block;width:24px;height:24px;flex:none;pointer-events:none}
+#playerRoot .win-btn{display:inline-flex;align-items:center;justify-content:center}
+#playerRoot .win-btn .sf-media-icon{width:18px;height:18px}
+#playerRoot #muteBtn{width:28px;min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center}
+#playerRoot #muteBtn .sf-media-icon{width:20px;height:20px}
+#labMiniDock .sf-media-icon,#miniDock .sf-media-icon{width:20px;height:20px}
+#playerRoot button,#labMiniDock button,#miniDock button{-webkit-appearance:none;appearance:none;font-family:inherit}
+#playerRoot input[type="range"]{-webkit-appearance:none;appearance:none;box-sizing:border-box;height:6px;border:0;border-radius:999px;padding:0;background:linear-gradient(to right,var(--primary,#10b981) 0 var(--range-fill,100%),var(--border,#374151) var(--range-fill,100%) 100%);touch-action:pan-y;cursor:pointer}
+#playerRoot input[type="range"]::-webkit-slider-runnable-track{height:6px;border:0;border-radius:999px;background:transparent}
+#playerRoot input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;margin-top:-5px;border:0;border-radius:50%;background:var(--primary,#10b981);box-shadow:none}
+#playerRoot input[type="range"]::-moz-range-track{height:6px;border:0;border-radius:999px;background:transparent}
+#playerRoot input[type="range"]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--primary,#10b981);box-shadow:none}
+#playerRoot input[type="checkbox"]{-webkit-appearance:none;appearance:none;box-sizing:border-box;display:inline-block;vertical-align:middle;flex:0 0 15px;width:15px;height:15px;min-width:15px;margin:0 4px 0 0;border:1px solid var(--muted,#9ca3af);border-radius:3px;background:transparent;cursor:pointer}
+#playerRoot input[type="checkbox"]:checked{border-color:var(--primary,#10b981);background-color:var(--primary,#10b981);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 8 3 3 7-7' fill='none' stroke='%23042f1a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-size:100% 100%}
+#playerRoot select{-webkit-appearance:none;appearance:none;box-sizing:border-box;padding:6px 28px 6px 10px;border:1px solid var(--border,#374151);border-radius:6px;background-color:var(--card,#0b1220);color:var(--text,#e5e7eb);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:12px;font-family:inherit}
+#playerRoot :is(button,input,select):focus-visible,#labMiniDock button:focus-visible{outline:2px solid var(--primary,#10b981);outline-offset:3px}
+#playerRoot input:disabled,#playerRoot select:disabled{opacity:.5;cursor:default}
+@media(forced-colors:active){#playerRoot input[type="checkbox"],#playerRoot select,#playerRoot input[type="range"]{appearance:auto;-webkit-appearance:auto;background-image:none}.sf-media-icon{forced-color-adjust:auto}}

@@ -1,0 +1,11 @@
+<?php require_once __DIR__.'/lib/loose_order.php';if(!isset($looseRows,$canManageAlbums,$albums)){http_response_code(403);exit;} ?>
+<?php foreach($looseRows as $t): ?>
+<li data-loose-id="<?=lab_h($t['id'])?>" data-loose-name="<?=lab_h($t['name']??'')?>" data-loose-added="<?=sf_loose_stamp($t)?>" data-loose-index="<?=(int)($t['index']??0)?>" data-loose-bitrate="<?=(int)($t['source_kbps']??0)?>" data-loose-artwork="<?=sf_loose_has_artwork($t)?'1':'0'?>" <?= $canManageAlbums?'data-source="'.lab_h($t['album_id']).'" data-track-id="'.lab_h($t['id']).'"':'' ?>>
+ <div class="job-meta loose-track-meta"><span class="loose-artwork"><?php if(!empty($t['artwork']) && (preg_match('~^https://[^/]*mzstatic\.com/~i',(string)$t['artwork']) || preg_match('/^artwork_image\.php\?key=[a-f0-9]{64}$/D',(string)$t['artwork']))): ?><img src="<?=lab_h($t['artwork'])?>" alt="" loading="lazy" referrerpolicy="no-referrer"><?php else: ?>♪<?php endif; ?></span><strong class="sf-loose-title" tabindex="-1"><?= lab_h($t['name']??'Pista') ?></strong><span class="muted"><?= (int)($t['source_kbps']??0) ?> kbps</span></div>
+ <div class="job-actions"><span data-sf-track="<?= lab_h($t['id']) ?>"></span><a class="btn primary" href="player.php?album=<?= lab_h($t['album_id']) ?>&amp;i=<?= (int)$t['index'] ?>" aria-label="Reproducir <?= lab_h($t['name']??'pista') ?>" title="Reproducir"><span aria-hidden="true">▶</span><span class="sf-loose-play-label"> Reproducir</span></a>
+ <?php if($canManageAlbums): ?><label class="sf-loose-destination"><span>Destino </span><select aria-label="Colección para <?= lab_h($t['name']??'pista') ?>"><option value="">Elegir colección</option><?php foreach($albums as $collection): if(($collection['album_type']??'')==='online_links')continue; ?><option value="<?= lab_h($collection['id']) ?>"><?= lab_h($collection['title']??'Colección') ?></option><?php endforeach; ?></select></label><button type="button" class="btn" data-move-track title="Mover a la colección elegida" aria-label="Mover a la colección elegida">Mover</button><?php endif; ?>
+ <?php sf_track_menu($t,(string)$t['album_id'],true); ?>
+ </div>
+ 
+</li>
+<?php endforeach; ?>

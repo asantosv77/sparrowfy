@@ -1,0 +1,1 @@
+<?php declare(strict_types=1);require __DIR__.'/lib.php';header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');$uid=(string)(lab_auth_current_account()['id']??'');if(session_status()===PHP_SESSION_ACTIVE)session_write_close();echo json_encode(['user'=>hash('sha256',$uid)]);

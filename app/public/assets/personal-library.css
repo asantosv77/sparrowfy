@@ -1,0 +1,92 @@
+@media(min-width:961px){body .lab-nav a{padding:8.8px 9.6px;gap:8.8px}body .lab-nav{row-gap:4px}.lab-nav .theme-menu-toggle{padding:8.8px 9.6px}}
+.sf-track-actions{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}.sf-star{font-size:1.25rem;min-width:40px}.sf-star[aria-pressed="true"]{color:var(--star,#e4ac36)}.sf-track-actions select{max-width:180px;min-height:36px}.sf-playlist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}.sf-playlist-card,.sf-shared-card{border:1px solid var(--border,#355);border-radius:12px;padding:16px}.sf-playlist-card .btn{margin:4px 0}#sf-share-url{width:100%;max-width:900px}#sf-personal-status{min-height:1.4em}.library-track-table td:last-child{min-width:220px}.sf-personal-page .job-actions{max-width:100%;flex-wrap:wrap}
+
+@media(min-width:721px){body .lab-nav .nav-new-album-mobile{display:none}}
+
+.sf-share-user-form{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-top:12px}.sf-share-user-form label{display:flex;flex-direction:column;gap:5px;min-width:0}.sf-share-user-form input{max-width:100%;width:180px}.sf-recipient{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+#playlist li{display:flex;align-items:center;gap:10px}
+#playlist .sf-queue-title{flex:1;min-width:0;overflow-wrap:anywhere}
+#playlist .sf-queue-favorite{flex:0 0 auto;margin-left:auto}
+#playlist .sf-queue-favorite .sf-star{display:inline-flex;align-items:center;justify-content:center;width:40px;min-height:40px;padding:0;background:transparent;border:1px solid transparent;box-shadow:none;font-size:28px;line-height:1;color:var(--muted,#9bb0b5)}
+#playlist .sf-queue-favorite .sf-star[aria-pressed="true"]{color:var(--star,#f5c842)}
+#playlist .sf-queue-favorite .sf-star:focus-visible{outline:2px solid var(--accent,#10b981);outline-offset:1px}
+#playlist .sf-queue-favorite .sf-star:disabled{opacity:.5}
+#sf-floating-notice{position:fixed;right:20px;bottom:24px;z-index:100000;max-width:min(360px,calc(100vw - 40px));padding:12px 18px;border:1px solid var(--border,#367879);border-radius:12px;background:var(--card,#102b31);color:var(--text,#f1f7f7);box-shadow:0 6px 24px #0006;pointer-events:none;opacity:1;transform:translateY(0);transition:opacity .3s ease,transform .3s ease}
+#sf-floating-notice.sf-notice-out{opacity:0;transform:translateY(8px)}
+@media(prefers-reduced-motion:reduce){#sf-floating-notice{transition:none}}
+/* Favorites and recent listening: aligned compact rows. */
+body .sf-compact-tracks{margin-top:12px}
+body .sf-compact-tracks>li{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;padding:9px 0;margin:0}
+body .sf-compact-tracks .job-meta{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:center;gap:16px;min-width:0}
+.sf-compact-tracks .job-meta strong,.sf-compact-tracks .job-meta .muted{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body .sf-compact-tracks .job-actions,body .sf-compact-tracks .sf-track-actions{flex-wrap:nowrap;gap:8px}
+body .sf-compact-tracks .btn{padding:5px 10px;min-height:32px;white-space:nowrap}
+body .sf-compact-tracks .sf-track-actions select{width:140px;max-width:140px;min-height:32px;padding:4px 6px}
+body .sf-compact-tracks .sf-star{order:3;min-width:34px;padding:3px 6px}
+@media(max-width:1000px){body .sf-compact-tracks .job-meta{grid-template-columns:minmax(0,1fr);gap:2px}}
+@media(max-width:700px){body .sf-compact-tracks>li{grid-template-columns:minmax(0,1fr);gap:6px;padding:10px 0}body .sf-compact-tracks .job-actions{flex-wrap:wrap}body .sf-compact-tracks .sf-track-actions select{width:110px;max-width:110px}}
+/* Personal actions occupy the free left side of the player title bar. */
+#playerRoot .win-chrome{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#playerRoot .win-chrome #sf-player-personal{display:flex;align-items:center;flex:1 1 210px;min-width:0;margin-right:auto;gap:6px;flex-wrap:nowrap}
+#playerRoot #sf-player-personal select{flex:1 1 90px;min-width:0;width:90px;max-width:150px;min-height:30px;padding:3px 5px;font-size:12px}
+#playerRoot #sf-player-personal .btn{min-height:30px;padding:3px 4px;font-size:12px;white-space:nowrap}
+#playerRoot #sf-player-personal .sf-star{min-width:24px;width:24px;font-size:20px;flex-shrink:0}
+#playerRoot .win-chrome>.win-btn{flex-shrink:0}
+@media(max-width:360px){#playerRoot .win-chrome #sf-player-personal{flex-basis:100%}}
+/* Keep favorites on queue rows; use the full title-bar width for lists. */
+#playerRoot #sf-player-personal .sf-star{display:none}
+#playerRoot .win-chrome{align-self:stretch;margin-left:-4px;justify-content:flex-start}
+#playerRoot .win-chrome #sf-player-personal{justify-content:flex-start;padding-left:0;margin-left:0}
+#playerRoot #shuffleBtn{opacity:.45;transition:opacity .2s,box-shadow .2s}
+#playerRoot #shuffleBtn[aria-pressed="true"]{opacity:1;box-shadow:0 0 0 2px var(--accent,#10b981)}
+#playerRoot #shuffleBtn:hover,#playerRoot #shuffleBtn:focus-visible{opacity:1}
+.sf-home-favorites{display:flex;align-items:center;flex-wrap:wrap;gap:14px;border:1px solid var(--border,#355);border-radius:12px;padding:14px;margin:12px 0 20px}
+.sf-home-favorites>div{flex:1;min-width:160px}.sf-home-favorites p{margin:4px 0 0}.sf-favorites-emblem{display:grid;place-items:center;width:48px;height:48px;border-radius:10px;background:var(--surface-raised,#17363d);color:var(--star,#f5c842);font-size:30px}
+/* One playlist per compact horizontal row. */
+.sf-personal-page .sf-playlist-grid{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.sf-personal-page .sf-playlist-card{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 12px;border-radius:10px}
+.sf-personal-page .sf-playlist-card h3{flex:0 1 210px;min-width:105px;max-width:240px;margin:0;font-size:1rem;line-height:1.3;white-space:normal;overflow-wrap:anywhere}
+.sf-personal-page .sf-playlist-card h3 a{color:var(--text,#edf7f7);text-decoration:none}
+.sf-personal-page .sf-playlist-card h3 a:hover{text-decoration:underline}
+.sf-personal-page .sf-playlist-card>p{margin:0;color:var(--muted,#9bb0b5);font-size:.85rem}
+.sf-personal-page .sf-playlist-card .btn{margin:0;min-height:32px;padding:5px 8px;white-space:normal;line-height:1.25;text-align:center;flex-shrink:1}
+.sf-personal-page .sf-playlist-card .sf-share-user-form{margin:0;gap:6px;align-items:center;flex-wrap:nowrap;flex:0 1 285px;min-width:210px}
+.sf-personal-page .sf-playlist-card .sf-share-user-form label{display:block;flex:1 1 110px;min-width:80px}
+.sf-personal-page .sf-playlist-card .sf-share-user-form input{width:100%;max-width:140px;min-height:32px;box-sizing:border-box;padding:4px 8px;border:1px solid var(--border,#355);border-radius:6px;background:var(--card,#102b31);color:var(--text,#edf7f7)}
+.sf-personal-page .sf-playlist-card .sf-recipient{flex-basis:100%;margin:0;padding-top:6px;font-size:.85rem}
+@media(max-width:700px){.sf-personal-page .sf-playlist-card h3{flex-basis:180px}.sf-personal-page .sf-playlist-card .sf-share-user-form{flex-wrap:wrap;flex-basis:100%}}
+
+
+/* Reserve useful action space instead of letting long filenames size the table. */
+body .library-track-table{table-layout:fixed}
+body .library-track-table th:first-child{width:38px}
+body .library-track-table th:nth-child(3){width:16%}
+body .library-track-table th:nth-child(4){width:13%}
+body .library-track-table .track-table-action{width:410px;white-space:normal}
+body .library-track-table td{padding:9px 12px;overflow-wrap:anywhere}
+.sf-song-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.sf-song-actions .sf-track-actions{flex-wrap:nowrap;gap:6px}
+body .sf-song-actions .btn{white-space:nowrap;padding:5px 8px;min-height:32px}
+.sf-song-actions select{width:115px;min-width:0;min-height:32px;padding:4px}
+.sf-song-actions .sf-star{order:3;min-width:32px}
+body .sf-compact-tracks .job-meta{text-align:left}
+@media(min-width:721px) and (max-width:1100px){body .library-track-table .track-table-action{width:285px}.sf-song-actions{flex-wrap:wrap}.sf-song-actions .sf-track-actions{flex-wrap:wrap}}
+@media(max-width:720px){body .library-track-table{min-width:0}body .library-track-table .track-table-action{width:100%;min-width:0}.sf-song-actions{justify-content:flex-start;flex-wrap:wrap}.sf-song-actions .sf-track-actions{flex-wrap:wrap}}
+
+/* Number in the filtered, paginated song list, never wrap its digits. */
+body .library-track-table th:first-child,body .library-track-table td.track-number{width:64px;min-width:64px;white-space:nowrap;overflow-wrap:normal;word-break:normal;padding-left:10px;padding-right:10px;font-variant-numeric:tabular-nums}
+
+/* Resalta la tarjeta de un album cuando se llega desde Gestionar album. */
+@keyframes sfAlbumGlow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--primary,#34d399) 0%, transparent);border-color:var(--border,#315563);transform:scale(1)}45%{box-shadow:0 0 0 3px color-mix(in srgb, var(--primary,#34d399) 90%, transparent),0 0 30px 8px color-mix(in srgb, var(--primary,#34d399) 45%, transparent);border-color:var(--primary,#34d399);transform:scale(1.015)}}
+.album-card.album-card-glow{position:relative;z-index:2;animation:sfAlbumGlow 1.15s ease-in-out 6}@media(prefers-reduced-motion:reduce){.album-card.album-card-glow{animation:none;outline:3px solid var(--primary,#34d399);outline-offset:4px}}
+
+/* Colecciones favoritas: estrella sobre la portada y seccion dedicada en Favoritos. */
+.album-card .sf-album-star{position:absolute;top:8px;left:8px;z-index:3;display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid var(--border,#315563);border-radius:8px;background:var(--surface-raised,#17363d);color:var(--text,#e6f1f3);font-size:19px;line-height:1;cursor:pointer;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:transform .12s ease,color .12s ease,background .12s ease}
+.album-card .sf-album-star:hover{transform:scale(1.07);background:var(--card,#0d2530)}
+.album-card .sf-album-star[aria-pressed="true"]{color:var(--star,#f5c842)}
+.album-card .sf-album-star:focus-visible{outline:2px solid var(--accent,#10b981);outline-offset:2px}
+.album-card .sf-album-star:disabled{opacity:.5;cursor:default}
+.app-shell .album-card .sf-album-star{width:30px;height:30px;top:5px;left:5px}
+.sf-favorite-albums{margin:6px 0 10px}
+.sf-fav-heading{margin:18px 0 8px;font-size:1.02rem;letter-spacing:.02em}
+@media(max-width:640px){.sf-fav-heading{margin:14px 0 6px}}

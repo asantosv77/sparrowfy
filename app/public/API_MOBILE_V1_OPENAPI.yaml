@@ -1,0 +1,349 @@
+openapi: 3.0.3
+info:
+  title: HLS Music Lab Mobile API
+  version: 1.0.1
+  description: >-
+    REST API para clientes iOS y Android. Autenticación Bearer. Favoritos,
+    recientes y listas comparten datos con la web. Compartir por API concede
+    acceso a una lista en vivo; no crea una copia. Los enlaces aleatorios de
+    la web y su importación de copias aún no tienen endpoints Bearer.
+  x-documentation-updated: '2026-11-22'
+  x-web-languages: [es, en]
+  x-web-worker-installer:
+    path: /worker_access.php?download=windows
+    authentication: web-session
+    permission: album-manager
+    media-type: application/zip
+  x-integration-guide: MOBILE_DEVELOPER_HANDOFF.md
+servers:
+  - url: https://sparrowfy.ddns.info/api/v1
+security:
+  - BearerAuth: []
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: {type: string}
+paths:
+  /index.php?r=health:
+    get:
+      security: []
+      summary: Estado de la API
+      responses: {'200': {description: API disponible}}
+  /index.php?r=auth/login:
+    post:
+      security: []
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: {type: string}
+                password: {type: string, format: password}
+                device_label: {type: string}
+      responses: {'200': {description: Token y perfil}, '401': {description: Credenciales inválidas}}
+  /index.php?r=auth/me:
+    get:
+      summary: Perfil de usuario autenticado
+      responses: {'200': {description: Perfil}}
+  /index.php?r=search:
+    get:
+      summary: Buscar melodías y álbumes
+      description: Busca por título de pista, nombre original, artista o título de álbum. Requiere Bearer token.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 120 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 100, default: 30 }
+        - in: query
+          name: offset
+          schema: { type: integer, minimum: 0, default: 0 }
+      responses:
+        '200':
+          description: Resultados de álbumes y melodías
+        '400':
+          description: Parámetro q inválido
+        '401':
+          description: Token ausente o inválido
+  /index.php?r=library/albums:
+    get:
+      summary: Buscar y explorar álbumes
+      parameters:
+        - {name: q, in: query, schema: {type: string}}
+        - {name: limit, in: query, schema: {type: integer, default: 30, maximum: 100}}
+        - {name: offset, in: query, schema: {type: integer, default: 0}}
+      responses: {'200': {description: Página de álbumes}}
+  /index.php?r=library/tracks:
+    get:
+      summary: Buscar pistas
+      parameters:
+        - {name: q, in: query, schema: {type: string}}
+        - {name: album_id, in: query, schema: {type: string}}
+        - {name: limit, in: query, schema: {type: integer, default: 30, maximum: 100}}
+        - {name: offset, in: query, schema: {type: integer, default: 0}}
+      responses: {'200': {description: Página de pistas}}
+  /index.php?r=me/favorites:
+    get: {summary: Listar favoritos privados del usuario autenticado, description: "Devuelve items con filas de catálogo, album_title y favorited_at. Sin paginación ni stream_url garantizado.", responses: {'200': {description: Favoritos}}}
+    post:
+      summary: Añadir favorito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [track_id], properties: {track_id: {type: string}}}
+      responses: {'201': {description: Añadido}}
+  /index.php?r=me/recent:
+    get: {summary: Listar reproducciones recientes privadas, description: "Devuelve items, limit y offset. Orden por played_at descendente. No garantiza stream_url ni contador de reproducciones.", responses: {'200': {description: Recientes}}}
+    post:
+      summary: Registrar reproducción
+      description: Enviar una vez cuando el audio comienza a sonar. Repetir incrementa el contador; no es idempotente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [track_id], properties: {track_id: {type: string}}}
+      responses: {'200': {description: Registrado}}
+  /index.php?r=me/playlists:
+    get: {summary: Listar listas propias y compartidas, responses: {'200': {description: Listas}}}
+    post:
+      summary: Crear lista privada
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [name], properties: {name: {type: string}, description: {type: string}}}
+      responses: {'201': {description: Lista creada}}
+  /index.php?r=me/playlists/shared:
+    get: {summary: Listas compartidas conmigo o públicas, responses: {'200': {description: Listas compartidas}}}
+  /index.php?r=me/suggestions:
+    post:
+      summary: Enviar sugerencia al administrador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [subject, message], properties: {subject: {type: string, maxLength: 160}, message: {type: string, maxLength: 5000}}}
+      responses: {'201': {description: Sugerencia enviada}}
+  /index.php?r=me/preferences:
+    get:
+      summary: Consultar preferencias de la cuenta autenticada
+      description: Devuelve preferencias sincronizadas entre la webapp y los clientes iOS/Android. Si aún no hay una fila almacenada, el servidor usa balanced_mobile como valor predeterminado.
+      responses:
+        '200':
+          description: Preferencias personales
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [hls_profile, available_profiles, scope]
+                properties:
+                  hls_profile:
+                    type: string
+                    enum: [continuity, balanced_mobile, audio_quality]
+                    example: balanced_mobile
+                  available_profiles:
+                    type: array
+                    items:
+                      type: string
+                      enum: [continuity, balanced_mobile, audio_quality]
+                  scope:
+                    type: string
+                    enum: [account]
+                    example: account
+        '401':
+          description: Token ausente o inválido
+  /index.php?r=me/preferences/hls:
+    patch:
+      summary: Actualizar el perfil HLS personal
+      description: Solo modifica la preferencia del usuario autenticado. Es una preferencia de ABR, no un bitrate fijo; el reproductor debe respetar los niveles disponibles en cada manifiesto HLS.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [hls_profile]
+              properties:
+                hls_profile:
+                  type: string
+                  enum: [continuity, balanced_mobile, audio_quality]
+                  description: continuity prioriza continuidad; balanced_mobile equilibra estabilidad y calidad; audio_quality favorece niveles superiores cuando la red lo permite.
+      responses:
+        '200':
+          description: Preferencia guardada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [hls_profile, updated]
+                properties:
+                  hls_profile:
+                    type: string
+                    enum: [continuity, balanced_mobile, audio_quality]
+                  updated:
+                    type: boolean
+                    enum: [true]
+        '400':
+          description: Perfil ausente o no permitido
+        '401':
+          description: Token ausente o inválido
+  /stream.php:
+    parameters:
+      - {name: track_id, in: query, required: true, schema: {type: string, pattern: '^[a-f0-9]{16}$'}}
+    get:
+      summary: Master HLS con Bearer y URLs relativas al despliegue
+      description: El cliente envia Bearer a cada playlist y segmento. Los hijos conservan track_id. Registra bytes HLS para consumo.
+      responses:
+        '200': {description: Manifiesto HLS, content: {application/vnd.apple.mpegurl: {schema: {type: string}}}}
+        '400': {description: Identificador invalido}
+        '401': {description: Token ausente, invalido o revocado}
+        '404': {description: Pista no encontrada}
+        '500': {description: Manifiesto no valido o error interno}
+    head:
+      summary: Cabeceras del master sin transferir ni contar audio
+      responses: {'200': {description: Cabeceras HLS}, '401': {description: Token no valido}, '404': {description: Pista no encontrada}}
+  /segment.php:
+    parameters:
+      - {name: track_id, in: query, required: true, schema: {type: string, pattern: '^[a-f0-9]{16}$'}}
+      - {name: file, in: query, required: true, schema: {type: string}, description: Valor opaco del manifiesto que debe pertenecer a la pista}
+    get:
+      summary: Playlist hija o segmento con contabilidad de consumo
+      parameters:
+        - {name: Range, in: header, required: false, schema: {type: string}, description: Un unico rango para archivos binarios}
+      responses:
+        '200': {description: Playlist HLS o binario TS/AAC/M4S/MP4}
+        '206': {description: Rango parcial de archivo binario}
+        '400': {description: Falta track_id valido}
+        '401': {description: Token ausente o invalido}
+        '404': {description: Archivo no encontrado o ajeno a la pista}
+        '416': {description: Rango invalido}
+        '500': {description: Error interno}
+    head:
+      summary: Cabeceras del archivo sin transferir ni contar audio
+      responses: {'200': {description: Cabeceras}, '401': {description: Token no valido}, '404': {description: Archivo no encontrado}}
+  /index.php?r=me/favorites/{track_id}:
+    parameters:
+      - {name: track_id, in: path, required: true, schema: {type: string}}
+    delete:
+      summary: Quitar un favorito del usuario autenticado
+      responses:
+        '200': {description: Favorito retirado; no elimina audio}
+        '401': {description: Token inválido o ausente}
+  /index.php?r=me/playlists/{playlist_id}:
+    parameters:
+      - {name: playlist_id, in: path, required: true, schema: {type: string}}
+    get:
+      summary: Consultar una lista propia o accesible
+      description: >-
+        Devuelve playlist y tracks ordenados por posición dentro de la lista.
+        El receptor de acceso compartido no puede editarla. Las filas tracks
+        no garantizan stream_url ni renditions; reproducir mediante stream.php
+        con track_id y Bearer. No asumir una base 0 o 1 para las posiciones.
+      responses:
+        '200':
+          description: Lista y pistas ordenadas
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [playlist, tracks]
+                properties:
+                  playlist: {type: object, additionalProperties: true}
+                  tracks: {type: array, items: {type: object, additionalProperties: true}}
+        '401': {description: Token inválido o ausente}
+        '404': {description: Lista inexistente o no accesible}
+  /index.php?r=me/playlists/{playlist_id}/tracks:
+    parameters:
+      - {name: playlist_id, in: path, required: true, schema: {type: string}}
+    post:
+      summary: Añadir una pista al final de una lista propia
+      description: No duplica la misma pista; solo el propietario puede editar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [track_id]
+              properties:
+                track_id: {type: string}
+      responses:
+        '201': {description: Asociación añadida o ya existente}
+        '401': {description: Token inválido o ausente}
+        '403': {description: Lista accesible pero el usuario no es propietario}
+        '404': {description: Lista no accesible o pista inexistente}
+  /index.php?r=me/playlists/{playlist_id}/tracks/{track_id}:
+    parameters:
+      - {name: playlist_id, in: path, required: true, schema: {type: string}}
+      - {name: track_id, in: path, required: true, schema: {type: string}}
+    delete:
+      summary: Quitar una pista de una lista propia
+      description: Solo quita la asociación; conserva el archivo musical.
+      responses:
+        '200': {description: Asociación retirada}
+        '401': {description: Token inválido o ausente}
+        '403': {description: Lista accesible pero el usuario no es propietario}
+        '404': {description: Lista inexistente o no accesible}
+  /index.php?r=me/playlists/{playlist_id}/share:
+    parameters:
+      - {name: playlist_id, in: path, required: true, schema: {type: string}}
+    post:
+      summary: Compartir o revocar acceso de lectura a una lista en vivo
+      description: >-
+        Solo el propietario. Con username, concede o revoca acceso a esa cuenta
+        activa. Sin username, cambia is_shared para todos los usuarios autenticados.
+        No genera enlaces aleatorios ni importa una copia. Esas funciones de la
+        web todavía no tienen endpoints Bearer. Revocar una vía de acceso no
+        revoca las otras.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shared: {type: boolean, default: true}
+                username:
+                  type: string
+                  description: Cuenta destinataria; omitir para visibilidad general autenticada
+            examples:
+              grant_user: {value: {username: usuario_destino, shared: true}}
+              revoke_user: {value: {username: usuario_destino, shared: false}}
+              publish: {value: {shared: true}}
+      responses:
+        '200':
+          description: Acceso actualizado
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    required: [success, shared_with, shared]
+                    properties:
+                      success: {type: boolean}
+                      shared_with: {type: string}
+                      shared: {type: boolean}
+                  - type: object
+                    required: [success, is_shared]
+                    properties:
+                      success: {type: boolean}
+                      is_shared: {type: boolean}
+        '400': {description: Datos inválidos o intento de compartir consigo mismo}
+        '401': {description: Token inválido o ausente}
+        '403': {description: Solo el propietario puede compartir}
+        '404': {description: Lista no accesible o destinatario inexistente/inactivo}

@@ -1,0 +1,22 @@
+:root{font-family:system-ui,sans-serif;background:var(--bg,#081c28);color:var(--text,#e4f0f3)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}
+main{max-width:1400px;margin:auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center}
+h1{margin:5px 0}
+small{color:var(--primary);letter-spacing:.12em}
+p,.note{color:var(--muted);line-height:1.6}
+.button,select{background:var(--surface-raised);color:inherit;padding:9px 16px;border:1px solid var(--border);border-radius:8px;text-decoration:none;color-scheme:inherit}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:20px 0}
+article,details{border:1px solid var(--border);background:var(--card);border-radius:14px;padding:18px}
+.cards span{display:block;font-size:.85rem;color:var(--muted)}
+.cards strong{display:block;margin-top:8px;font-size:1.3rem}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.wide{grid-column:1/-1}
+h2{font-size:1.1rem;margin:0 0 15px}
+.plot{height:270px;position:relative}
+.table{overflow:auto}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:10px;border-bottom:1px solid var(--border)}
+.note{font-size:.82rem}
+summary{cursor:pointer}
+@media(max-width:700px){main{padding:14px}.charts{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.cards strong{font-size:1rem}.plot{height:230px}}

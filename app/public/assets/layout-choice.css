@@ -1,0 +1,13 @@
+.theme-menu__panel{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
+@media(min-width:721px){
+ html[data-layout="panorama"] .app-shell{grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "side" "content";grid-template-rows:auto auto 1fr}
+ html[data-layout="panorama"] .lab-nav{position:relative;top:auto;height:auto;min-height:0;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px;padding:10px 20px;overflow:visible;border-right:0;border-bottom:1px solid var(--border,#34505c)}
+ html[data-layout="panorama"] .lab-nav a{padding:8px 10px;font-size:.85rem;gap:6px;white-space:nowrap}
+ html[data-layout="panorama"] .lab-nav .nav-section-label,html[data-layout="panorama"] .lab-nav .nav-divider,html[data-layout="panorama"] .lab-nav .nav-spacer,html[data-layout="panorama"] .lab-nav .nav-brand-note{display:none}
+ html[data-layout="panorama"] .lab-nav .theme-menu{margin:0 0 0 auto}
+ html[data-layout="panorama"] .lab-main{padding:20px clamp(16px,3vw,48px) 100px}
+ html[data-layout="panorama"] .album-grid{gap:12px;grid-template-columns:repeat(auto-fill,minmax(165px,1fr))}
+ html[data-layout="panorama"] .hero-card{padding:20px}
+ html[data-layout="panorama"] .library-track-table td{padding-top:9px;padding-bottom:9px}
+}
+@media(max-width:720px){html[data-layout="panorama"] .lab-main{padding-left:8px;padding-right:8px}html[data-layout="panorama"] .album-grid{gap:8px}html[data-layout="panorama"] .album-card{padding:7px}}

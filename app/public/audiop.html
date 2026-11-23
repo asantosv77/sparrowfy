@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor HLS de MÃºsica - Drive-Craft</title>
+    <!-- HLS.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        :root {
+            --primary: #10b981;
+            --bg: #090d16;
+            --card-bg: #111827;
+            --text: #f9fafb;
+            --text-secondary: #9ca3af;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .music-player {
+            background-color: var(--card-bg);
+            border: 1px solid #1f2937;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .track-info {
+            text-align: center;
+        }
+
+        .track-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+        }
+
+        .track-artist {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Barra de Progreso */
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background-color: #374151;
+            border-radius: 3px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Controles Principales */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-play {
+            background-color: var(--primary);
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+        }
+
+        /* Opciones Inferiores (Calidad y Volumen) */
+        .footer-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #1f2937;
+            padding-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .quality-select {
+            background-color: #1f2937;
+            color: var(--text);
+            border: 1px solid #374151;
+            border-radius: 6px;
+            padding: 4px 8px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            width: 80px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+    </style>
+<script defer src=assets/sf-language.js></script></head>
+<body>
+
+    <div class="music-player">
+        <!-- Etiqueta de audio oculta (o semivisible, no requiere <video>) -->
+        <audio id="audioPlayer" preload="auto"></audio>
+
+        <div class="track-info">
+            <h2 class="track-title">Enamorado Tuyo</h2>
+            <p class="track-artist">Drive-Craft (ID: 1042)</p>
+        </div>
+
+        <!-- Progreso -->
+        <div class="progress-container">
+            <div class="progress-bar-bg" id="progressBarBg">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="time-row">
+                <span id="currentTime">00:00</span>
+                <span id="durationTime">00:00</span>
+            </div>
+        </div>
+
+        <!-- Controles -->
+        <div class="controls-row">
+            <button class="btn" id="rewindBtn" title="Retroceder 10s">âª</button>
+            <button class="btn btn-play" id="playPauseBtn" title="Reproducer/Pausar">â–¶</button>
+            <button class="btn" id="forwardBtn" title="Adelantar 10s">â©</button>
+        </div>
+
+        <!-- Ajustes de Calidad y Volumen -->
+        <div class="footer-controls">
+            <div class="volume-container">
+                <button class="btn" id="muteBtn" style="font-size: 1rem;">ðŸ”Š</button>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="1">
+            </div>
+
+            <select class="quality-select" id="qualitySelect" title="Calidad de Audio">
+                <option value="-1">Auto (Adaptativo)</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const progressBarBg = document.getElementById('progressBarBg');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationTimeEl = document.getElementById('durationTime');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const muteBtn = document.getElementById('muteBtn');
+        const qualitySelect = document.getElementById('qualitySelect');
+        const rewindBtn = document.getElementById('rewindBtn');
+        const forwardBtn = document.getElementById('forwardBtn');
+
+        // Ruta apuntando directo a tu estructura lÃ³gica en Drive-Craft
+        const streamSource = 'storage/hls/1042/master.m3u8';
+        let hls = null;
+
+        function initAudioHls(url) {
+            if (hls) hls.destroy();
+
+            if (Hls.isSupported()) {
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(audio);
+
+                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                    // Cargar los streams definidos en el master.m3u8 (96k, 128k, 320k)
+                    qualitySelect.innerHTML = '<option value="-1">Auto (Adaptativo)</option>';
+                    hls.levels.forEach((level, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        // Muestra el nombre o los kbps basados en tu archivo master
+                        const kbps = Math.round(level.bitrate / 1000);
+                        option.textContent = `${kbps} kbps`;
+                        qualitySelect.appendChild(option);
+                    });
+                });
+
+                hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+                    qualitySelect.value = hls.currentLevel;
+                });
+
+            } else if (audio.canPlayType('application/vnd.apple.mpegurl')) {
+                // Soporte nativo de HLS para Safari en iOS / macOS
+                audio.src = url;
+                qualitySelect.innerHTML = '<option value="-1">Nativo (Auto)</option>';
+            } else {
+                alert('Tu navegador no soporta reproducciÃ³n HLS de audio.');
+            }
+        }
+
+        // Inicializar al cargar
+        initAudioHls(streamSource);
+
+        // Reproducir / Pausar
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.textContent = 'â¸';
+            } else {
+                audio.pause();
+                playPauseBtn.textContent = 'â–¶';
+            }
+        }
+
+        playPauseBtn.addEventListener('click', togglePlay);
+
+        audio.addEventListener('play', () => { playPauseBtn.textContent = 'â¸'; });
+        audio.addEventListener('pause', () => { playPauseBtn.textContent = 'â–¶'; });
+
+        // Formato de tiempo (MM:SS)
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        // Actualizar barra de progreso y tiempos
+        audio.addEventListener('timeupdate', () => {
+            const current = audio.currentTime;
+            const duration = audio.duration || 0;
+            if (duration > 0) {
+                const percent = (current / duration) * 100;
+                progressBar.style.width = `${percent}%`;
+            }
+            currentTimeEl.textContent = formatTime(current);
+            durationTimeEl.textContent = formatTime(duration);
+        });
+
+        // Hacer clic en la barra para saltar (seeking)
+        progressBarBg.addEventListener('click', (e) => {
+            const rect = progressBarBg.getBoundingClientRect();
+            const pos = (e.clientX - rect.left) / rect.width;
+            if (audio.duration) {
+                audio.currentTime = pos * audio.duration;
+            }
+        });
+
+        // Botones de avance / retroceso rÃ¡pido
+        rewindBtn.addEventListener('click', () => { audio.currentTime -= 10; });
+        forwardBtn.addEventListener('click', () => { audio.currentTime += 10; });
+
+        // Control de Volumen
+        volumeSlider.addEventListener('input', (e) => {
+            audio.volume = e.target.value;
+            audio.muted = (audio.volume === 0);
+            updateMuteIcon();
+        });
+
+        muteBtn.addEventListener('click', () => {
+            audio.muted = !audio.muted;
+            volumeSlider.value = audio.muted ? 0 : audio.volume;
+            updateMuteIcon();
+        });
+
+        function updateMuteIcon() {
+            if (audio.muted || audio.volume === 0) {
+                muteBtn.textContent = 'ðŸ”‡';
+            } else {
+                muteBtn.textContent = 'ðŸ”Š';
+            }
+        }
+
+        // Selector manual de calidades (96k, 128k, 320k)
+        qualitySelect.addEventListener('change', (e) => {
+            if (hls) {
+                hls.currentLevel = parseInt(e.target.value);
+            }
+        });
+    </script>
+</body>
+</html>
+

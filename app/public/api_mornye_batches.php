@@ -1,0 +1,30 @@
+<?php
+declare(strict_types=1);
+require __DIR__.'/lib/processing_queue.php';lab_auth_require_album_manager();require_once __DIR__.'/lib/mornye_requests.php';header('Content-Type: application/json');header('Cache-Control: no-store');
+try {
+ $method=$_SERVER['REQUEST_METHOD']??'';$input=$method==='GET'?$_GET:$_POST;$action=(string)($input['action']??'status');
+ // Status reads never enqueue, retry or synchronize a form token.
+ if($method==='GET'){if(!in_array($action,['list','status'],true))throw new RuntimeException('Acción de lectura inválida');}
+ else{lab_require_same_origin_post();if($method!=='POST'||!lab_auth_verify_csrf((string)($_POST['csrf_token']??'')))throw new RuntimeException('Sesión caducada. Recarga para continuar.');}
+ $user=lab_auth_current_account();session_write_close();$db=sfq_db();if($action==='submit'||$action==='retry')sfmn_schema($db);$album=(string)($input['album_id']??'');if(!preg_match('/^[a-f0-9]{16}$/D',$album)||!lab_load_album($album))throw new RuntimeException('Álbum no disponible');
+ if($action==='list'){$q=$db->prepare('SELECT * FROM sf_mornye_batches WHERE user_id=? AND album_id=? ORDER BY created_at DESC LIMIT 20');$q->execute([$user['id'],$album]);$items=[];foreach($q->fetchAll(PDO::FETCH_ASSOC) as $b)$items[]=sfmn_batch_status($db,$b);echo json_encode(['items'=>$items]);exit;}
+ $id=(string)($input['id']??'');if(!preg_match('/^[a-f0-9]{32}$/D',$id))throw new RuntimeException('Lote inválido');$q=$db->prepare('SELECT * FROM sf_mornye_batches WHERE id=? AND user_id=? AND album_id=?');$q->execute([$id,$user['id'],$album]);$batch=$q->fetch(PDO::FETCH_ASSOC);$q->closeCursor();
+ if($action==='retry'){
+ if(!$batch)throw new RuntimeException('Lote no disponible');$tracks=json_decode($batch['tracks'],true);foreach($tracks as $t){if(empty($t['job_id']))continue;$qj=$db->prepare('SELECT state,payload FROM sf_processing_jobs WHERE id=? AND user_id=?');$qj->execute([$t['job_id'],$user['id']]);$j=$qj->fetch(PDO::FETCH_ASSOC);if(!$j)continue;
+ if($j['state']==='done'){$f=$db->prepare("SELECT id,operation,payload FROM sf_processing_jobs WHERE user_id=? AND json_extract(payload,'$.mornye_parent')=? AND state='failed' ORDER BY created_at DESC LIMIT 1");$f->execute([$user['id'],$t['job_id']]);$final=$f->fetch(PDO::FETCH_ASSOC);if($final){$fp=json_decode($final['payload'],true);$valid=true;
+ if($final['operation']==='upload'&&!is_file((string)($fp['file']??''))){$parent=json_decode($j['payload'],true);$sid=$parent['mornye_client_source']??'';$valid=false;if(preg_match('/^[a-f0-9]{32}$/D',$sid)){require_once __DIR__.'/lib/client_processing.php';$dir=sfwc_root().'/'.$sid;$m=json_decode((string)@file_get_contents($dir.'/state.json'),true);$src=$dir.'/'.basename($m['source_file']??'missing');if(($m['user']??'')===$user['id']&&is_file($src)&&!is_link($src)){$copy=sfq_dir().'/'.bin2hex(random_bytes(16)).'.upload';if(copy($src,$copy)){$fp['file']=$copy;$valid=true;}}}}
+ if($valid)$db->prepare("UPDATE sf_processing_jobs SET state='queued',stage='Reanudando publicación existente',error=NULL,payload=?,updated_at=? WHERE id=? AND state='failed'")->execute([json_encode($fp),gmdate('c'),$final['id']]);}continue;}
+ if($j['state']!=='failed')continue;sfmn_resume_failed_source($db,$user,$t['job_id'],(bool)$batch['local_mode'],$t['title']);}
+ echo json_encode(sfmn_batch_status($db,$batch));exit;
+ }
+ if($action==='submit'){
+ ignore_user_abort(true);$lock=sfmn_submission_lock();try{
+ // Re-read under submission lock to tolerate duplicate clicks and lost HTTP responses.
+ $q->execute([$id,$user['id'],$album]);$batch=$q->fetch(PDO::FETCH_ASSOC);$q->closeCursor();
+ if(!$batch){$tracks=json_decode((string)($_POST['tracks']??'[]'),true,32,JSON_THROW_ON_ERROR);if(!is_array($tracks)||!count($tracks)||count($tracks)>100)throw new RuntimeException('Selecciona entre 1 y 100 pistas');$local=($_POST['local']??'')==='1';if($local&&empty(lab_load_config()['webcodecs_enabled']))throw new RuntimeException('WebCodecs está deshabilitado. Recarga y usa procesamiento en servidor.');if($local&&preg_match('/Android|iPhone|iPad|iPod|Mobile/i',$_SERVER['HTTP_USER_AGENT']??''))throw new RuntimeException('Conversión local solo en escritorio');$items=[];$seen=[];foreach($tracks as $t){$url=sf_external_mornye_url((string)($t['url']??''));$title=trim((string)($t['filename']??''));if(!$title||mb_strlen($title)>200||preg_match('/[\x00-\x1f\x7f]/',$title))throw new RuntimeException('Nombre de pista inválido');if(isset($seen[$url]))continue;$seen[$url]=true;$target=(string)($t['replace_track_id']??'');$destination=(string)($t['target_album']??$album);if($target!==''&&(!preg_match('/^[a-f0-9]{16}$/D',$target)||!preg_match('/^[a-f0-9]{16}$/D',$destination)))throw new RuntimeException('Destino de reemplazo inválido');$items[]=['url'=>$url,'title'=>$title,'job_id'=>'','replace_track_id'=>$target,'target_album'=>$destination];}
+ $db->prepare('INSERT INTO sf_mornye_batches VALUES(?,?,?,?,?,?)')->execute([$id,$user['id'],$album,(int)$local,json_encode($items),time()]);$q->execute([$id,$user['id'],$album]);$batch=$q->fetch(PDO::FETCH_ASSOC);$q->closeCursor();}
+ $items=json_decode($batch['tracks'],true);foreach($items as &$t){if(!empty($t['job_id'])){sfmn_resume_failed_source($db,$user,$t['job_id'],(bool)$batch['local_mode'],$t['title']);continue;}$result=sfmn_enqueue($db,$user,$t['target_album']??$album,$t['url'],$t['title'],(bool)$batch['local_mode'],$t['replace_track_id']??'');$t['job_id']=$result['job_id'];$db->prepare('UPDATE sf_mornye_batches SET tracks=? WHERE id=?')->execute([json_encode($items),$id]);}unset($t);$q->execute([$id,$user['id'],$album]);$batch=$q->fetch(PDO::FETCH_ASSOC);$q->closeCursor();
+ }finally{flock($lock,LOCK_UN);fclose($lock);}
+ }elseif($action!=='status')throw new RuntimeException('Acción inválida');
+ if(!$batch)throw new RuntimeException('Lote no disponible');echo json_encode(sfmn_batch_status($db,$batch),JSON_INVALID_UTF8_SUBSTITUTE);
+}catch(Throwable $e){http_response_code(400);echo json_encode(['error'=>$e->getMessage()],JSON_INVALID_UTF8_SUBSTITUTE);}

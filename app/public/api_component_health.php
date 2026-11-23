@@ -1,0 +1,2 @@
+<?php
+require __DIR__.'/lib.php';lab_auth_require_album_manager();require_once __DIR__.'/lib/acoustid_health.php';header('Content-Type: application/json; charset=utf-8');header('Cache-Control: no-store');$r=sf_acoustid_health();echo json_encode(['acoustid'=>['state'=>$r['state'],'retry_after'=>(int)($r['retry_after']??0),'message'=>($r['state']==='unavailable'?sf_acoustid_skip_message():'')]],JSON_UNESCAPED_UNICODE);

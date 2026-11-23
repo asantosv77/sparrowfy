@@ -1,0 +1,20 @@
+/* Optional telemetry: configuration is checked server-side on every batch.
+ * Never records URLs, credentials, free-form error text or request bodies.
+ */
+(()=>{'use strict';window.sfCreatePlaybackDiagnostics=(audio,payload,intent=()=>true)=>{
+ let settings=payload.playbackDiagnostics||{},queue=[],track='',loadAt=0,started=false,stallAt=0,run=crypto.randomUUID?.().replaceAll('-','')||String(Date.now());
+ const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),engine=ios&&audio.canPlayType('application/vnd.apple.mpegurl')?'native':window.Hls?.isSupported()?'hlsjs':audio.canPlayType('application/vnd.apple.mpegurl')?'native':'none',pwa=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true,client=(ios?'ios':/Android/.test(navigator.userAgent)?'android':'desktop')+(pwa?'-pwa':'-browser');
+ const snapshot=()=>{let ahead=0;try{for(let i=0;i<audio.buffered.length;i++)if(audio.buffered.start(i)<=audio.currentTime&&audio.buffered.end(i)>=audio.currentTime)ahead=audio.buffered.end(i)-audio.currentTime;}catch(_){}return {position:audio.currentTime||0,ready:audio.readyState,network:audio.networkState,buffer_ahead:Math.round(ahead*100)/100};};
+ function note(event,fields={}){if(event==='autoplay_blocked')loadAt=0;if(!settings.enabled)return;const row={event,track,run,engine,client,profile:payload.hlsProfile||'native',...snapshot(),...fields};if(settings.console)console.debug('[Sparrow-Fy reproducción]',row);if(settings.record){queue.push(row);if(queue.length>60)queue.shift();}}
+ async function flush(){if(!settings.enabled||!settings.record){queue=[];return;}if(!queue.length)return;const events=queue.splice(0,30),token=document.querySelector('meta[name="sf-csrf"]')?.content;if(!token)return;const c=new AbortController(),timer=setTimeout(()=>c.abort(),5000);try{const r=await fetch('api_playback_diagnostics.php',{method:'POST',body:new URLSearchParams({events:JSON.stringify(events),csrf_token:token}),credentials:'same-origin',keepalive:true,signal:c.signal});if(r.ok){const d=await r.json();if(d.disabled){settings.enabled=false;queue=[];}}}catch(_){}finally{clearTimeout(timer);}}
+ async function refresh(){const c=new AbortController(),timer=setTimeout(()=>c.abort(),5000);try{const r=await fetch('api_playback_diagnostics.php',{cache:'no-store',signal:c.signal});if(r.ok){settings=await r.json();if(!settings.enabled){queue=[];loadAt=0;stallAt=0;}}}catch(_){}finally{clearTimeout(timer);}}
+ const endStall=()=>{if(stallAt){note('buffer_end',{buffer_ms:Math.round(performance.now()-stallAt)});stallAt=0;}};
+ audio.addEventListener('play',()=>{if(!started&&!loadAt)loadAt=performance.now();note('play_request');});
+ audio.addEventListener('playing',()=>{if(!started){note('started',{startup_ms:loadAt?Math.round(performance.now()-loadAt):0});started=true;}else if(stallAt)note('recovered');endStall();});
+ audio.addEventListener('waiting',()=>{if(settings.enabled&&started&&!audio.seeking&&!stallAt){stallAt=performance.now();note('buffer_start');}});
+ audio.addEventListener('pause',()=>{if(!intent())endStall();if(!started)loadAt=0;note('pause');});audio.addEventListener('seeking',endStall);audio.addEventListener('ended',()=>{endStall();note('ended');flush();});audio.addEventListener('seeked',()=>note('seek'));
+ audio.addEventListener('error',()=>note('media_error',{status:audio.error?.code||0}));
+ window.addEventListener('offline',()=>note('offline'));window.addEventListener('online',()=>note('online'));window.addEventListener('pagehide',flush);document.addEventListener('visibilitychange',()=>{if(document.hidden)flush();});
+ const upload=setInterval(flush,10000),poll=setInterval(refresh,60000);
+ return {note,load(t,autoplay){endStall();track=/^[a-f0-9]{16}$/.test(t?.id||'')?t.id:'';loadAt=settings.enabled&&autoplay?performance.now():0;started=false;note('track_load');},hls(data){note('hls_error',{reason:String(data.details||'unknown').replace(/[^a-zA-Z0-9_.-]/g,'').slice(0,80),status:data.response?.code||data.networkDetails?.status||0,fatal:data.fatal?1:0});},settings:()=>settings};
+};})();

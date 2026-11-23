@@ -1,0 +1,9 @@
+{
+  "name": "sparrowfy-spotify-charts-bridge",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Dedicated authenticated browser bridge for Spotify Charts",
+  "dependencies": {
+    "puppeteer-core": "23.11.1"
+  }
+}

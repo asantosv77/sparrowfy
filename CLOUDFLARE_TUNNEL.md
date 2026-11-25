@@ -87,6 +87,8 @@ El nombre del contenedor puede variar si cambiaste `COMPOSE_PROJECT_NAME`. Obté
 docker compose -f docker-compose.yml -f docker-compose.tunnel.yml --profile tunel ps -q tunnel
 ```
 
+En Docker Desktop para Windows añade `-f docker-compose.windows.yml` a ese comando.
+
 ### Seguridad
 
 - El túnel publica **toda** la web, incluido el login. Usa contraseñas largas y no compartas la URL.
@@ -117,7 +119,7 @@ El primer usuario administrador se crea **dentro del contenedor**, con el asiste
 docker compose exec www bash scripts/crear-admin.sh
 ```
 
-Pide el usuario y la contraseña dos veces. La contraseña debe tener entre 14 y 72 bytes. El script llama a `scripts/auth_setup.php`, que solo crea la cuenta si la base está vacía; si ya existen usuarios, conserva el administrador protegido y no sobrescribe nada.
+Pide el usuario y la contraseña dos veces. La contraseña debe tener entre 14 y 72 bytes. El script llama a `scripts/auth_setup.php`, que solo crea la cuenta si la base está vacía; si ya existen usuarios, conserva el administrador protegido y no sobrescribe nada. Esto se comprobó en Docker Desktop el 25-Nov-2026: con volúmenes nuevos creó el admin y el login funcionó; con un volumen `app_data` reutilizado el script solo conserva las credenciales existentes. Comprueba primero con `docker compose exec www php scripts/auth_diagnose.php`; si ya hay un admin activo, usa directamente el reseteo de contraseña.
 
 También puedes hacerlo sin interfaz, con variables de entorno:
 
@@ -232,6 +234,8 @@ The container name may differ if you changed `COMPOSE_PROJECT_NAME`. Get the rea
 docker compose -f docker-compose.yml -f docker-compose.tunnel.yml --profile tunel ps -q tunnel
 ```
 
+On Docker Desktop for Windows add `-f docker-compose.windows.yml` to that command.
+
 ### Security
 
 - The tunnel publishes the **whole** web app, including the login page. Use long passwords and do not share the URL.
@@ -262,7 +266,7 @@ The first administrator is created **inside the container** with the interactive
 docker compose exec www bash scripts/crear-admin.sh
 ```
 
-It asks for the username and the password twice. The password must be 14 to 72 bytes long. The script calls `scripts/auth_setup.php`, which only creates the account when the database is empty; if users already exist, it keeps the protected admin and overwrites nothing.
+It asks for the username and the password twice. The password must be 14 to 72 bytes long. The script calls `scripts/auth_setup.php`, which only creates the account when the database is empty; if users already exist, it keeps the protected admin and overwrites nothing. This was verified on Docker Desktop on 25-Nov-2026: with fresh volumes it created the admin and login worked; with a reused `app_data` volume the script only keeps the existing credentials. Check first with `docker compose exec www php scripts/auth_diagnose.php`; if an active admin already exists, go straight to the password reset.
 
 You can also create it non-interactively with environment variables:
 

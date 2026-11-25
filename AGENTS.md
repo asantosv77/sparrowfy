@@ -95,6 +95,8 @@ docker compose -f docker-compose.yml exec www bash scripts/crear-admin.sh
 
 Pide usuario y contraseña dos veces; la contraseña debe tener entre **14 y 72 bytes**. El script llama a `scripts/auth_setup.php`, que solo crea la cuenta si la base está vacía y respeta el administrador protegido.
 
+> **Comprobado en Docker Desktop (25-Nov-2026):** con un volumen `app_data` nuevo, el alta creó el administrador y el login web funcionó. Si reutilizas un volumen existente, `auth_setup.php` responde `La cuenta principal ya está configurada. Se conservan sus credenciales.` y **no** crea otra cuenta. Comprueba primero con `docker compose -f docker-compose.yml exec www php scripts/auth_diagnose.php`; si ya hay un administrador activo, ve directo al reseteo de contraseña. Para una prueba aislada usa otro nombre de proyecto (`docker compose -p sf-prueba-20261125 -f docker-compose.yml ... up -d`) y así creas volúmenes nuevos sin tocar los existentes.
+
 No interactivo:
 
 ```bash
@@ -138,6 +140,20 @@ En Windows:
 ```
 
 El script imprime una URL temporal `https://*.trycloudflare.com` que apunta al puerto **interno** `www:8080`. El `8080` no es el puerto del host; tus 443/80 quedan intactos. La URL cambia al reiniciar. Para detenerlo: `bash scripts/cloudflare-tunnel.sh stop`.
+
+Para **descubrir la URL dinámica asignada** sin volver a levantar el túnel:
+
+```bash
+bash scripts/cloudflare-tunnel.sh url
+```
+
+En Windows:
+
+```powershell
+.\scripts\cloudflare-tunnel.ps1 -Action url
+```
+
+También se puede leer de los logs: `docker logs $(docker compose -f docker-compose.yml -f docker-compose.tunnel.yml -f docker-compose.windows.yml ps -q tunnel) 2>&1 | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -n 1`. En Linux omite el `-f docker-compose.windows.yml`.
 
 ### 6. comprobación final
 
@@ -241,6 +257,8 @@ docker compose -f docker-compose.yml exec www bash scripts/crear-admin.sh
 
 It asks for the username and password twice; the password must be **14 to 72 bytes**. The script calls `scripts/auth_setup.php`, which only creates the account when the database is empty and honors the protected admin.
 
+> **Verified on Docker Desktop (25-Nov-2026):** with a fresh `app_data` volume, the setup created the admin and web login worked. If you reuse an existing volume, `auth_setup.php` prints `La cuenta principal ya está configurada. Se conservan sus credenciales.` and **does not** create another account. Check first with `docker compose -f docker-compose.yml exec www php scripts/auth_diagnose.php`; if an active admin already exists, go straight to the password reset. For an isolated test use a different project name (`docker compose -p sf-test-20261125 -f docker-compose.yml ... up -d`) so new volumes are created without touching existing ones.
+
 Non-interactive:
 
 ```bash
@@ -284,6 +302,20 @@ On Windows:
 ```
 
 The script prints a temporary `https://*.trycloudflare.com` URL pointing at Docker's **internal** port `www:8080`. The `8080` is not the host port; your 443/80 stay untouched. The URL changes on restart. To stop it: `bash scripts/cloudflare-tunnel.sh stop`.
+
+To **discover the assigned dynamic URL** again without restarting the tunnel:
+
+```bash
+bash scripts/cloudflare-tunnel.sh url
+```
+
+On Windows:
+
+```powershell
+.\scripts\cloudflare-tunnel.ps1 -Action url
+```
+
+You can also read it from the logs: `docker logs $(docker compose -f docker-compose.yml -f docker-compose.tunnel.yml -f docker-compose.windows.yml ps -q tunnel) 2>&1 | grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' | tail -n 1`. On Linux omit the `-f docker-compose.windows.yml` flag.
 
 ### 6. Final checks
 

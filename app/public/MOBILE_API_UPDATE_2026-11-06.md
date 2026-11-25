@@ -22,7 +22,7 @@ Este documento prevalece sobre notas históricas de octubre. Contrato revisado c
 
 ## Responsabilidad del cliente
 Auto/calidad, búfer, reconexión, cola, aleatorio/repetición, controles multimedia, accesibilidad y offline corresponden al reproductor nativo. HTTP/3 se negocia en el proxy; mantener fallback HTTP/2/TCP. El formato HLS no cambia.
-La API conserva Bearer de30 días. No confundirlo con la cookie web Mantener sesión ni asumir revocación compartida de dispositivos. Usar auth/logout del token móvil.
+La API conserva un Bearer persistente hasta logout/revocación o borrado de datos de la app. No confundirlo con la cookie web Mantener sesión; «Cerrar todas las sesiones móviles» y «Cerrar todos los accesos» sí revocan el Bearer. Usar auth/logout del token móvil.
 me/preferences ofrece un perfil para configurar el reproductor; HLS no fuerza variantes ni normaliza volumen.
 
 ## Cambios web aún no expuestos como contrato Bearer

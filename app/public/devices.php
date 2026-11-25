@@ -49,7 +49,7 @@ $epoch=sf_device_epoch($p,$selected);$stamp=hash('sha256',$target['password_hash
 $q=$p->prepare('SELECT d.*,EXISTS(SELECT 1 FROM sf_device_remember m JOIN sf_remember_tokens t ON t.selector=m.selector WHERE m.device_id=d.id AND t.expires_at>? AND t.created_at>?) AS remembered FROM sf_devices d WHERE d.user_id=? ORDER BY d.last_seen DESC LIMIT 200');$q->execute([time(),time()-sf_remember_days()*86400,$selected]);$rows=$q->fetchAll();
 sf_mobile_sessions_schema($p);
 $mq=$p->prepare('SELECT id,device_label,created_at,expires_at,last_used_at,revoked_at FROM sessions WHERE user_id=? ORDER BY COALESCE(last_used_at,created_at) DESC LIMIT 200');$mq->execute([$selected]);$mobile=$mq->fetchAll();
-$mobileNow=gmdate('c');$mobileActive=0;foreach($mobile as $m)if($m['revoked_at']===null&&(string)$m['expires_at']>$mobileNow)$mobileActive++;
+$mobileActive=0;foreach($mobile as $m)if($m['revoked_at']===null)$mobileActive++;
 $recent=0;foreach($rows as $r)if($r['revoked_at']===null&&(int)$r['epoch']===$epoch&&hash_equals($r['credential_stamp'],$stamp)&&(int)$r['last_seen']>=time()-300)$recent++;
 $overview=[];
 if($adminView){
@@ -71,7 +71,7 @@ $csrf=lab_h(lab_auth_csrf_token());$back=$adminView?'admin_users.php':'change_pa
 <h2>Sesiones móviles (API)</h2>
 <p class="device-note">Tokens Bearer emitidos por la API móvil. Cerrar una sesión invalida ese token en la siguiente petición; no cambia tu contraseña. Los manifiestos y segmentos HLS de esa aplicación dejan de responder con ese token.</p>
 <?php if($mobileActive>0):?><form method="post" onsubmit="return confirm('¿Cerrar todas las sesiones móviles de esta cuenta? Las aplicaciones tendrán que iniciar sesión de nuevo.');"><input type="hidden" name="csrf_token" value="<?=$csrf?>"><input type="hidden" name="user_id" value="<?=lab_h($selected)?>"><input type="hidden" name="action" value="revoke_mobile_all"><button class="btn" name="confirm" value="1">Cerrar todas las sesiones móviles</button></form><?php endif;?>
-<?php foreach($mobile as $m):$mactive=$m['revoked_at']===null&&(string)$m['expires_at']>$mobileNow;$mlabel=trim((string)$m['device_label']);$mlabel=$mlabel!==''?$mlabel:'Aplicación móvil';?>
+<?php foreach($mobile as $m):$mactive=$m['revoked_at']===null;$mlabel=trim((string)$m['device_label']);$mlabel=$mlabel!==''?$mlabel:'Aplicación móvil';?>
 <article class="device-row"><div><strong><?=lab_h($mlabel)?></strong> <span class="device-status"><?=$mactive?'Activa':($m['revoked_at']!==null?'Cerrada':'Expirada')?></span><small>Creada: <?=device_mobile_time((string)$m['created_at'])?> · Último uso: <?=device_mobile_time($m['last_used_at']!==null?(string)$m['last_used_at']:null)?></small><small>Expira: <?=device_mobile_time((string)$m['expires_at'])?></small></div>
 <?php if($mactive):?><form method="post" onsubmit="return confirm('¿Cerrar esta sesión móvil? La aplicación tendrá que iniciar sesión de nuevo.');"><input type="hidden" name="csrf_token" value="<?=$csrf?>"><input type="hidden" name="user_id" value="<?=lab_h($selected)?>"><input type="hidden" name="session_id" value="<?=lab_h((string)$m['id'])?>"><input type="hidden" name="action" value="revoke_mobile"><button class="btn" name="confirm" value="1">Cerrar sesión móvil</button></form><?php endif;?></article>
 <?php endforeach;if(!$mobile):?><p>No hay sesiones móviles registradas todavía. Se crearán al iniciar sesión desde la aplicación o la API.</p><?php endif;?></section></main></body></html>

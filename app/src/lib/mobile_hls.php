@@ -6,7 +6,7 @@ function sf_mobile_hls_error(int $code):never{http_response_code($code);header('
 function sf_mobile_hls_account(PDO $p):string{
  $h=(string)($_SERVER['HTTP_AUTHORIZATION']??'');if(!$h&&function_exists('getallheaders'))foreach(getallheaders() as $k=>$v)if(strtolower($k)==='authorization')$h=(string)$v;
  if(!preg_match('/^Bearer\s+([a-f0-9]{64})$/iD',$h,$m))sf_mobile_hls_error(401);
- $q=$p->prepare('SELECT u.id FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.refresh_token_hash=? AND s.revoked_at IS NULL AND s.expires_at>? AND u.is_active=1 LIMIT 1');$q->execute([hash('sha256',strtolower($m[1])),gmdate('c')]);$uid=$q->fetchColumn();if(!$uid)sf_mobile_hls_error(401);return (string)$uid;
+ $q=$p->prepare('SELECT u.id FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.refresh_token_hash=? AND s.revoked_at IS NULL AND u.is_active=1 LIMIT 1');$q->execute([hash('sha256',strtolower($m[1]))]);$uid=$q->fetchColumn();if(!$uid)sf_mobile_hls_error(401);return (string)$uid;
 }
 function sf_mobile_hls_target(string $base,string $uri,string $trackRoot):string{
  if($uri===''||str_contains($uri,"\0")||str_contains($uri,'\\')||preg_match('~^(?:/|[a-z][a-z0-9+.-]*:)~i',$uri)||str_contains($uri,'?')||str_contains($uri,'#'))throw new RuntimeException('Invalid HLS URI');

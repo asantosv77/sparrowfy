@@ -21,7 +21,7 @@ Abre [localhost:8081](http://localhost:8081). El instalador del worker está en 
 
 Tu despliegue normal publica en **443** con letsencrypt usando el **80** para el challenge. Si estás detrás de CGNAT y no puedes abrir puertos, [publica el servicio con Cloudflare Tunnel](CLOUDFLARE_TUNNEL.md) como alternativa: `bash scripts/cloudflare-tunnel.sh start` (o `.\scripts\cloudflare-tunnel.ps1` en Windows). La misma guía explica cómo crear el primer administrador y cómo resetear su contraseña con `scripts/auth_reset_password.php`.
 
-El repositorio permanece privado hasta incorporar el APK completo y confirmar el enlace a su repositorio. El código del servidor y de la web se entrega **TAL CUAL**, con la [licencia Apache 2.0](LICENSE), los [créditos](NOTICE) y los [avisos de terceros](app/public/THIRD_PARTY_LICENSES.md).
+El repositorio es público e incluye el proyecto Android y el APK de depuración. El código del servidor y de la web se entrega **TAL CUAL**, con la [licencia Apache 2.0](LICENSE), los [créditos](NOTICE) y los [avisos de terceros](app/public/THIRD_PARTY_LICENSES.md).
 
 ## English
 
@@ -40,7 +40,7 @@ Open [localhost:8081](http://localhost:8081). Administrators and library manager
 
 Your normal deployment publishes on **443** with letsencrypt using **80** for the challenge. If you are behind CGNAT and cannot forward ports, [publish the service with Cloudflare Tunnel](CLOUDFLARE_TUNNEL.md) as an alternative: run `bash scripts/cloudflare-tunnel.sh start` (or `.\scripts\cloudflare-tunnel.ps1` on Windows). The same guide explains how to create the first admin and how to reset the password with `scripts/auth_reset_password.php`.
 
-The repository stays private until the complete APK is added and its repository link is confirmed. The server and web app are provided **AS IS** under the [Apache 2.0 license](LICENSE). See the [credits](NOTICE) and [third-party notices](app/public/THIRD_PARTY_LICENSES.md).
+The repository is public and includes the Android project and the debug APK. The server and web app are provided **AS IS** under the [Apache 2.0 license](LICENSE). See the [credits](NOTICE) and [third-party notices](app/public/THIRD_PARTY_LICENSES.md).
 
 ## Galería / Gallery
 

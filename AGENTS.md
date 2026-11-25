@@ -160,7 +160,7 @@ También se puede leer de los logs: `docker logs $(docker compose -f docker-comp
 - `docker compose ... ps` → `www` healthy.
 - `GET /api/v1/index.php?r=health` → `{"status":"ok"}` (o equivalente).
 - Login web con el admin creado.
-- Si aplica, la URL pública responde `200` y carga el login.
+- Si aplica, la URL pública redirige (`302`) a `login.php` y `/login.php` responde `200` con la página de acceso.
 
 ### Restricciones para el agente
 
@@ -322,7 +322,7 @@ You can also read it from the logs: `docker logs $(docker compose -f docker-comp
 - `docker compose ... ps` → `www` healthy.
 - `GET /api/v1/index.php?r=health` → `{"status":"ok"}` (or equivalent).
 - Web login with the admin you created.
-- If applicable, the public URL returns `200` and shows the login page.
+- If applicable, the public URL redirects (`302`) to `login.php` and `/login.php` returns `200` with the sign-in page.
 
 ### Agent constraints
 

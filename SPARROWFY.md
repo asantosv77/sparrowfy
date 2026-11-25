@@ -14,17 +14,45 @@ Esta sección sustituye las instrucciones anteriores de conexión a las integrac
 
 En Sparrowfy abre Music Charts, pulsa «Conectar / renovar sesión», entra con tu propia cuenta desde http://127.0.0.1:16080/vnc.html y pulsa «Comprobar conexión». En una Pi remota usa un túnel SSH de loopback para acceder a esos puertos.
 
-El administrador se crea desde la terminal local. Para restablecer la contraseña de una cuenta existente usa:
+El primer administrador se crea desde la terminal local:
 
 ```powershell
-docker exec -it sparrowfy-deploy-www-1 bash scripts/crear-admin.sh --restablecer
+docker compose exec www bash scripts/crear-admin.sh
 ```
 
-Para publicar solo la web temporalmente en Docker Desktop:
+El asistente pide usuario y contraseña dos veces; la contraseña debe tener entre 14 y 72 bytes. Llama a `scripts/auth_setup.php`, que solo crea la cuenta si la base está vacía. Para restablecer la contraseña de una cuenta existente usa:
 
 ```powershell
-docker compose -f docker-compose.yml -f docker-compose.windows.yml -f docker-compose.tunnel.yml up -d tunnel
-docker logs sparrowfy-deploy-tunnel-1
+docker compose exec www bash scripts/crear-admin.sh --restablecer
+```
+
+También puedes hacerlo de forma no interactiva con `HLS_RESET_USER` y `HLS_RESET_PASSWORD` sobre `scripts/auth_reset_password.php`. Ese script no crea usuarios ni cambia el estado activo/inactivo. Verifica con `docker compose exec www php scripts/auth_diagnose.php`. La contraseña nunca se imprime. La guía completa está en [CLOUDFLARE_TUNNEL.md](CLOUDFLARE_TUNNEL.md).
+
+### Publicación con Cloudflare Tunnel (alternativa para CGNAT)
+
+El esquema normal publica el web en **443** con letsencrypt usando el **80** para el challenge. Ese es el recomendado cuando hay IP pública. Detrás de CGNAT no hay IP pública ni port forwarding posible, así que el 443/80 del host no es alcanzable desde internet. El perfil `tunel` de `docker-compose.tunnel.yml` es una **alternativa opcional**: invierte la conexión con `cloudflared tunnel --url http://www:8080` y entrega una URL temporal `https://*.trycloudflare.com`. El `8080` es el puerto **interno** del contenedor en la red de Docker; no sustituye ni modifica el 443/80 del host. El ejemplo de `drawio` solo sirve de referencia y sus puertos son relativos a ese proyecto.
+
+En Linux, macOS o WSL:
+
+```bash
+bash scripts/cloudflare-tunnel.sh start
+```
+
+En Windows PowerShell:
+
+```powershell
+.\scripts\cloudflare-tunnel.ps1 -Action start
+```
+
+El script espera la URL en los logs y la imprime. Para verla después: `bash scripts/cloudflare-tunnel.sh url`; para detener el túnel: `bash scripts/cloudflare-tunnel.sh stop`. La URL cambia en cada reinicio y no es un secreto: la protección es el login de Sparrow-Fy. No expongas Mornye ni Spotify Charts por este túnel. Para un enlace fijo, usa un *named tunnel* con token de Cloudflare y una regla de Cloudflare Access; los pasos están en [CLOUDFLARE_TUNNEL.md](CLOUDFLARE_TUNNEL.md).
+
+Comando manual equivalente al del ejemplo `drawio`:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.windows.yml -f docker-compose.tunnel.yml --profile tunel up -d tunnel
+docker logs sparrowfy-deploy-tunnel-1 2>&1 |
+  Select-String -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' -AllMatches |
+  ForEach-Object { $_.Matches } | Select-Object -Last 1 -ExpandProperty Value
 ```
 
 ## 1. Producción observada

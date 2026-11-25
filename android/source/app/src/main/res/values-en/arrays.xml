@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="theme_names">
+        <item>Dark teal</item>
+        <item>Dark blue</item>
+        <item>Dark purple</item>
+        <item>Light</item>
+        <item>Light sand</item>
+        <item>Solarized</item>
+        <item>Monokai</item>
+        <item>Deep black</item>
+        <item>Ruby blue</item>
+    </string-array>
+</resources>

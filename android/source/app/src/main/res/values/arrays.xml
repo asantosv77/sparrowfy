@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="theme_names">
+        <item>Verde azulado oscuro</item>
+        <item>Azul oscuro</item>
+        <item>Morado oscuro</item>
+        <item>Claro</item>
+        <item>Arena clara</item>
+        <item>Solarizado</item>
+        <item>Monokai</item>
+        <item>Negro profundo</item>
+        <item>Rojo y azul</item>
+    </string-array>
+</resources>

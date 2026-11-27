@@ -9,15 +9,31 @@ $q=lab_auth_pdo()->prepare('SELECT album_id FROM tracks WHERE id=?');$q->execute
 if(!is_string($aid)||!preg_match('/^[a-f0-9]{16}$/D',$aid)){http_response_code(404);exit('Pista no encontrada');}
 $album=lab_load_album($aid);$idx=null;foreach($album['tracks']??[] as $i=>$entry)if($entry['id']===$tid)$idx=$i;
 if($idx===null){http_response_code(404);exit('Pista no encontrada');}
-$error='';$saved=false;
+$error='';$saved=false;$unchanged=false;
 if(($_SERVER['REQUEST_METHOD']??'GET')==='POST'){
- $lock=fopen(LAB_ALBUMS.'/'.$aid.'/.processing-append.lock','c');
- try{
-  if(!$lock||!flock($lock,LOCK_EX))throw new RuntimeException('Colección ocupada');
-  $album=lab_load_album($aid);$idx=null;foreach($album['tracks']??[] as $i=>$entry)if($entry['id']===$tid)$idx=$i;
-  if($idx===null)throw new RuntimeException('La pista cambió de ubicación. Vuelve a abrir el editor.');
-  $next=sf_editor_metadata($_POST,$album['tracks'][$idx]);if(isset($_FILES['cover_image'])&&($_FILES['cover_image']['error']??UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_NO_FILE)$next['artwork']=sf_editor_store_cover($_FILES['cover_image']);$album['tracks'][$idx]=$next;lab_save_album($album);$saved=true;
- }catch(Throwable $e){$error=$e->getMessage();}finally{if($lock){flock($lock,LOCK_UN);fclose($lock);}}
+ $upload=$_FILES['cover_image']??null;
+ $hasCoverUpload=$upload!==null&&($upload['error']??UPLOAD_ERR_NO_FILE)!==UPLOAD_ERR_NO_FILE;
+ $unchanged=!$hasCoverUpload&&!sf_editor_metadata_changed($_POST,$album['tracks'][$idx]);
+ if(!$unchanged){
+  $lock=fopen(LAB_ALBUMS.'/'.$aid.'/.processing-append.lock','c');
+  try{
+   if(!$lock||!flock($lock,LOCK_EX))throw new RuntimeException('Colección ocupada');
+   $album=lab_load_album($aid);$idx=null;foreach($album['tracks']??[] as $i=>$entry)if($entry['id']===$tid)$idx=$i;
+   if($idx===null)throw new RuntimeException('La pista cambió de ubicación. Vuelve a abrir el editor.');
+   $current=$album['tracks'][$idx];
+   $unchanged=!$hasCoverUpload&&!sf_editor_metadata_changed($_POST,$current);
+   if(!$unchanged){
+    $next=sf_editor_metadata($_POST,$current);
+    if($hasCoverUpload)$next['artwork']=sf_editor_store_cover($upload);
+    $album['tracks'][$idx]=$next;
+    lab_save_album($album);
+    $saved=true;
+   }
+  }catch(Throwable $e){
+   $busy=$e instanceof PDOException&&in_array((int)($e->errorInfo[1]??0)&255,[5,6],true);
+   $error=$busy?'El catálogo está ocupado. Vuelve a intentar guardar los metadatos en unos segundos.':$e->getMessage();
+  }finally{if($lock){flock($lock,LOCK_UN);fclose($lock);}}
+ }
 }
 $t=$album['tracks'][$idx];$hasAudio=!empty($t['hls'])&&!empty($t['job_id']);
 if(($_GET['source']??'')==='1'){header('Cache-Control: no-store');header('Content-Type: application/json');echo json_encode(['source'=>'stream.php?path='.rawurlencode(preg_replace('~^hls_out/~','',(string)($t['hls']??''))),'duration'=>(float)($t['duration']??0)]);exit;}
@@ -28,7 +44,7 @@ function sf_edit_field(string $key,string $label,string $help,array $t):void{ ?>
 <meta name="sf-save-result" content="<?= $error!==''?'error':($saved?'success':'') ?>"><link rel="stylesheet" href="assets/save-feedback.css?v=2"><script src="assets/save-feedback.js?v=2"></script><script defer src=assets/sf-language.js></script></head><body class="track-editor-body"><main class="track-editor-wrap">
 <header class="editor-heading"><div><p class="editor-eyebrow">BIBLIOTECA MUSICAL</p><h1>Editar metadatos</h1><p class="muted">Metadatos, identificación, portada y edición de audio.</p></div><button type="button" id="closeEdit" class="btn" title="Cerrar el editor; las tareas enviadas continúan en el servidor">Cerrar</button></header>
 <?php if($error):?><p class="editor-alert" role="alert"><?=lab_h($error)?></p><?php endif;?>
-<?php if($saved):?><script>window.parent.postMessage({source:'sf-track-edit',type:'saved'},location.origin);</script><p role="status">Metadatos guardados.</p><?php endif;?>
+<?php if($saved):?><script>window.parent.postMessage({source:'sf-track-edit',type:'saved'},location.origin);</script><p role="status">Metadatos guardados.</p><?php elseif($unchanged):?><p role="status">No hay cambios en los metadatos.</p><?php endif;?>
 <form method="post" enctype="multipart/form-data" id="trackMetadataForm"><input type="hidden" name="csrf_token" value="<?=lab_h(lab_auth_csrf_token())?>">
 <section class="editor-section"><h2>Información de la melodía <button type="button" class="editor-help" data-editor-help="El nombre visible identifica la pista en las listas. Título, artista y álbum ayudan a encontrar letras y portadas. Guardar estos datos no modifica el audio." aria-label="Ayuda sobre los metadatos">?</button></h2><div class="metadata-fields">
 <?php sf_edit_field('name','Nombre visible','Nombre que se muestra en el catálogo y en la cola del reproductor.',$t);

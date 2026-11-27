@@ -1,8 +1,20 @@
 <?php
 declare(strict_types=1);
+const SF_EDITOR_METADATA_LIMITS = ['name'=>160,'title'=>160,'artist'=>160,'album'=>160,'genre'=>100,'year'=>4];
+
+function sf_editor_metadata_changed(array $post, array $track): bool {
+ foreach ([...array_keys(SF_EDITOR_METADATA_LIMITS), 'artwork'] as $key) {
+  if (array_key_exists($key, $post) &&
+      (!is_string($post[$key]) || trim($post[$key]) !== trim((string)($track[$key] ?? '')))) {
+   return true;
+  }
+ }
+ return false;
+}
+
 /** Validate all metadata before mutating a catalogue entry. Audio/references are preserved. */
 function sf_editor_metadata(array $post,array $track): array {
- foreach(['name'=>160,'title'=>160,'artist'=>160,'album'=>160,'genre'=>100,'year'=>4] as $key=>$limit){
+ foreach(SF_EDITOR_METADATA_LIMITS as $key=>$limit){
   $value=trim((string)($post[$key]??($track[$key]??'')));
   if(mb_strlen($value)>$limit||preg_match('/[\x00-\x1F\x7F]/u',$value))throw new RuntimeException('Revisa el campo '.$key.'.');
   $track[$key]=$value;

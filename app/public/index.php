@@ -373,7 +373,7 @@ $sfThemeColor = lab_theme_meta_color($sfTheme);
 <?php if($hasManagementPermission): ?><script src="assets/track-reuse.js?v=20261116-console1"></script><link rel="stylesheet" href="assets/track-reuse.css?v=2"><?php endif; ?>
 <script src="assets/client-processing.js?v=20261114-worker-controls1"></script><script src="assets/loose-live.js?v=2"></script><script src="assets/loose-order.js?v=1"></script><script src="assets/upload-progress.js?v=20261114-import-review1"></script><script src="assets/library-organize.js?v=20261114-import-review1"></script>
 <style>.album-card.track-drop-active{outline:3px solid var(--accent,#10b981);outline-offset:4px}li[draggable="true"]{cursor:grab}#loose-upload{flex-wrap:wrap}#loose-upload input{max-width:100%}</style>
-<link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=3"></script><script src="assets/shell-player.js?v=20261116-console1"></script>
+<link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=3"></script><script src="assets/shell-player.js?v=floating2"></script>
 <script src="assets/player-frame-fit.js?v=14"></script>
 <link rel="stylesheet" href="assets/player.css?v=mini-contrast1">
 <script src="assets/splash.js" defer></script>

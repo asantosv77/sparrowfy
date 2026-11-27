@@ -1,5 +1,6 @@
 (()=>{'use strict';
 window.sfMembershipPicker=async({title,load,save,trigger})=>{
+ const document=trigger?.ownerDocument||window.document;
  const d=document.createElement('dialog');d.className='sf-membership-picker';
  const h=document.createElement('h3');h.textContent=title;
  const search=document.createElement('input');search.type='search';search.placeholder='Buscar…';search.setAttribute('aria-label','Buscar destino');

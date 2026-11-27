@@ -49,6 +49,18 @@ $embed = !empty($_GET['embed']);
 if ($tracks && $startIndex >= count($tracks)) {
     $startIndex = 0;
 }
+if (array_key_exists('track_id', $_GET)) {
+    $trackId = $_GET['track_id'];
+    $match = is_string($trackId) && $trackId !== ''
+        ? array_search($trackId, array_map(static fn($track) => $track['id'] ?? null, $tracks), true)
+        : false;
+    if ($match === false) {
+        http_response_code(404);
+        exit('La canción seleccionada ya no está disponible en esta colección.');
+    }
+    $startIndex = $match;
+    $startIndexExplicit = true;
+}
 require_once __DIR__.'/lib/loudness.php';
 if($album)$album['tracks']=sf_loudness_attach($album['tracks']??[]);
 require_once __DIR__.'/lib/playback_diagnostics.php';
@@ -84,8 +96,9 @@ if(($_GET['payload']??'')==='1'){header('Content-Type: application/json; charset
 <meta name="sf-csrf" content="<?= lab_h(lab_auth_csrf_token()) ?>">
 <link rel="stylesheet" href="assets/personal-library.css?v=theme-sweep1">
 
-<script src="assets/membership-picker.js?v=1"></script><link rel="stylesheet" href="assets/membership-picker.css?v=theme-sweep1">
-<script src="assets/artwork-backup.js?v=20261116-console1" defer></script><meta name="sf-account" content="<?=lab_h((string)(lab_auth_current_account()['id']??''))?>"><script src="assets/offline-store.js?v=offline-state2" defer></script><script src="assets/offline-quality.js?v=quality1" defer></script><script src="assets/offline-downloads.js?v=offline-state2" defer></script><link rel="stylesheet" href="assets/save-feedback.css?v=2"><script src="assets/save-feedback.js?v=2"></script><script defer src=assets/sf-language.js></script></head>
+<script src="assets/membership-picker.js?v=floating1"></script><link rel="stylesheet" href="assets/membership-picker.css?v=theme-sweep1">
+<script src="assets/artwork-backup.js?v=20261116-console1" defer></script><meta name="sf-account" content="<?=lab_h((string)(lab_auth_current_account()['id']??''))?>"><script src="assets/offline-store.js?v=offline-state2" defer></script><script src="assets/offline-quality.js?v=quality1" defer></script><script src="assets/offline-downloads.js?v=offline-state2" defer></script><link rel="stylesheet" href="assets/save-feedback.css?v=2"><script src="assets/save-feedback.js?v=2"></script><script defer src=assets/sf-language.js></script><style>#btnFloat[hidden]{display:none!important}</style>
+</head>
 <body class="player-body<?= $embed ? ' is-embed' : '' ?>">
   <?php if (!$embed): ?>
   <a class="back-link" href="<?= $albumId ? 'album_edit.php?id=' . lab_h(urlencode($albumId)) : 'index.php?view=library' ?>">← Volver</a>
@@ -94,15 +107,15 @@ if(($_GET['payload']??'')==='1'){header('Content-Type: application/json; charset
   <?php if (!$tracks): ?>
     <p class="err-banner">No hay pistas. <a href="index.php">Inicio</a></p>
   <?php else: ?>
+  <audio id="audioPlayer" preload="auto"></audio>
   <div class="music-player" id="playerRoot">
     <div class="win-chrome">
       <div class="player-top-actions"><div id="sf-player-personal" class="sf-track-actions"></div><button type="button" class="eq-toggle" id="eqToggle" title="Ecualizador">EQ</button></div>
+      <?php if ($embed): ?><button type="button" class="win-btn" id="btnFloat" title="Separar reproductor" aria-label="Separar reproductor" aria-pressed="false" hidden><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 4h6v6m0-6-9 9m7 0v6H5V6h6"/></svg></button><?php endif; ?>
       <button type="button" class="win-btn win-min" id="btnMin" title="Minimizar"><svg class="sf-media-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 6l4 4 4-4"/><path d="M5 18h14"/></svg></button>
       <button type="button" class="win-btn win-max" id="btnMax" title="Karaoke (maximizar letras)"><svg class="sf-media-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/><path stroke-width="1.8" d="M9 9.5h6M9 14.5h6"/></svg></button>
       <button type="button" class="win-btn win-close" id="btnClose" title="Cerrar"><svg class="sf-media-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6.5 6.5 11 11m0-11-11 11"/></svg></button>
     </div>
-
-    <audio id="audioPlayer" preload="auto"></audio>
 
     <div class="track-info track-info-row">
       <img class="track-art" id="trackArt" alt="" width="56" height="56" hidden>
@@ -232,8 +245,8 @@ if(($_GET['payload']??'')==='1'){header('Content-Type: application/json; charset
 </div>
 <script src="assets/library.js?v=favalb1"></script>
 <script src="assets/navigation.js?v=album-return1"></script>
-<script src="assets/personal-library.js?v=56"></script>
-<link rel="stylesheet" href="assets/player-tools.css?v=3"><script src="assets/playback-diagnostics.js?v=ios-hls1"></script><script src="assets/next-buffer.js?v=2"></script><link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=20261113-repeat2"></script><script src="assets/player.js?v=cover-stable1"></script>
+<script src="assets/personal-library.js?v=floating1"></script>
+<link rel="stylesheet" href="assets/player-tools.css?v=3"><script src="assets/playback-diagnostics.js?v=ios-hls1"></script><script src="assets/next-buffer.js?v=2"></script><link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=20261113-repeat2"></script><script src="assets/player.js?v=floating2"></script>
 <script src="assets/player-queue-presence.js?v=1"></script><script src="assets/player-content-size.js?v=compact-elastic1"></script>
 
   <?php endif; ?>

@@ -1141,7 +1141,7 @@ fd.set('csrf_token',document.querySelector('meta[name="sf-csrf"]')?.content||'')
 
 
 <script src="assets/navigation.js?v=album-return1"></script>
-<link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=3"></script><script src="assets/shell-player.js?v=20261116-console1"></script>
+<link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=3"></script><script src="assets/shell-player.js?v=floating2"></script>
 <script src="assets/player-frame-fit.js?v=14"></script>
 <script src="assets/audio-jobs.js?v=jobs-panel3"></script>
 

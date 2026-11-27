@@ -115,7 +115,7 @@ function sf_reuse_search(string $term, float $duration = 0):array{
     $out=[];foreach(array_slice($matches,0,30,true) as $r){$a=lab_load_album($r['album_id']);if(!$a)continue;$i=null;foreach($a['tracks']??[] as $n=>$t)if(($t['id']??'')===$r['id']){$i=$n;break;}if($i===null)continue;
         $locations=[['id'=>$a['id'],'title'=>$a['id']==='fffffffffffffffe'?'Pistas sin asignar a colección':$a['title']]];
         $q=$p->prepare('SELECT album_id FROM sf_album_track_refs WHERE source_album_id=? AND track_id=?');$q->execute([$a['id'],$r['id']]);foreach($q->fetchAll(PDO::FETCH_COLUMN) as $aid){$b=lab_load_album($aid);if($b)$locations[]=['id'=>$aid,'title'=>$b['title']];}
-        $out[]=['id'=>$r['id'],'album_id'=>$r['album_id'],'name'=>$r['name'],'duration'=>$duration>0||(float)($r['duration']??0)>0?(float)($r['duration']??0):null,'match_score'=>(int)$r['_score'],'match_reason'=>(string)$r['_reason'],'locations'=>$locations,'play_url'=>'player.php?album='.rawurlencode($a['id']).'&i='.$i];
+        $out[]=['id'=>$r['id'],'album_id'=>$r['album_id'],'name'=>$r['name'],'duration'=>$duration>0||(float)($r['duration']??0)>0?(float)($r['duration']??0):null,'match_score'=>(int)$r['_score'],'match_reason'=>(string)$r['_reason'],'locations'=>$locations,'play_url'=>'player.php?album='.rawurlencode($a['id']).'&track_id='.rawurlencode($r['id'])];
     }
     return $out;
 }

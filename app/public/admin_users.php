@@ -36,6 +36,31 @@ function au_checked_permissions(PDO $pdo, array $target, int $active, int $canMa
     }
     return $canManage;
 }
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store');
+    $csrf = $_POST['csrf_token'] ?? null;
+    if (!is_string($csrf) || !lab_auth_verify_csrf($csrf)) {
+        http_response_code(403);
+        echo json_encode(['error'=>'La sesión del formulario expiró. Recarga la página e inténtalo de nuevo.']);
+        exit;
+    }
+    try {
+        $id = $_POST['id'] ?? null;
+        if (!is_string($id)) throw new DomainException('Identificador de cuenta inválido.');
+        require_once __DIR__.'/lib/user_account_delete.php';
+        sf_delete_account($pdo, (string)($_SESSION['user_id'] ?? ''), $id, LAB_DATA, getenv('PHP_SESSION_DIR') ?: '/var/lib/hlsml-sessions');
+        echo json_encode(['success'=>true]);
+    } catch (DomainException $e) {
+        http_response_code(409);
+        echo json_encode(['error'=>$e->getMessage()]);
+    } catch (Throwable $e) {
+        error_log('Sparrow-Fy account cleanup: '.get_class($e));
+        http_response_code(500);
+        echo json_encode(['error'=>'No se pudo completar el borrado. Si la cuenta quedó desactivada, vuelve a intentar.']);
+    }
+    exit;
+}
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     if (!lab_auth_verify_csrf(isset($_POST['csrf_token']) ? (string)$_POST['csrf_token'] : null)) {
         http_response_code(403); $error = 'La sesión del formulario expiró. Recarga la página e inténtalo de nuevo.';
@@ -185,8 +210,8 @@ $csrf = lab_auth_csrf_token();
 .user-search input[type=search]:focus{outline:2px solid var(--primary,#10b981);outline-offset:1px}
 .user-search .search-count{font-size:.85rem;color:var(--muted,#94a3b8);white-space:nowrap}
 .user-table{display:grid;gap:0}
-.user-row{display:grid;grid-template-columns:minmax(100px,1fr) auto auto auto 180px auto;align-items:center;gap:.7rem .65rem;padding:.85rem 0;border-bottom:1px solid var(--border,#334155)}
-.user-row.admin-row{grid-template-columns:minmax(100px,1fr) auto auto auto 180px auto auto}
+.user-row{display:grid;grid-template-columns:minmax(100px,1fr) auto auto auto 180px auto auto;align-items:center;gap:.7rem .65rem;padding:.85rem 0;border-bottom:1px solid var(--border,#334155)}
+.user-row.admin-row{grid-template-columns:minmax(100px,1fr) auto auto auto 180px auto auto auto}
 @media(min-width:761px){
 .user-table{overflow-x:auto}
 .user-row,.user-row.admin-row{min-width:900px;gap:.55rem .5rem}
@@ -201,6 +226,8 @@ $csrf = lab_auth_csrf_token();
 .user-row .user-download{margin:0}.user-row .user-pass{box-sizing:border-box;width:100%;min-width:0;padding:.65rem .75rem;border:1px solid var(--border,#334155);border-radius:.5rem;background:var(--input-bg,transparent);color:inherit;font:inherit}
 .user-row .user-pass:focus{outline:2px solid var(--primary,#10b981);outline-offset:1px}
 .user-row .btn{white-space:nowrap}
+.user-row .btn.user-delete{width:2.35rem;min-height:2.35rem;display:inline-grid;place-items:center;justify-self:end;padding:.35rem;color:var(--danger,#f87171)}
+.user-row .btn.user-delete:disabled{opacity:.42;cursor:default}
 .user-row details.protected-details{margin-top:.35rem}
 .user-row details.protected-details summary{cursor:pointer;font-size:.82rem;color:var(--muted,#94a3b8)}
 .user-row details.protected-details p{margin:.4rem 0 0;padding:.55rem .65rem;border:1px solid #0d9b75;border-radius:.45rem;background:rgba(16,185,129,.08);font-size:.82rem;line-height:1.4}
@@ -222,6 +249,7 @@ $csrf = lab_auth_csrf_token();
  <input type="search" id="userSearch" placeholder="Buscar usuario…" autocomplete="off" aria-controls="usersTable">
  <span class="search-count" id="userSearchCount" role="status" aria-live="polite"></span>
  <span class="bulk-status" id="usersBulkStatus" role="status" aria-live="polite"></span>
+ <span class="bulk-status" id="usersDeleteStatus" role="status" aria-live="polite"></span>
 </div>
 <form method="post" id="usersBulkForm">
 <input type="hidden" name="csrf_token" value="<?=au_h($csrf)?>">
@@ -231,7 +259,7 @@ $csrf = lab_auth_csrf_token();
 <?php foreach($users as $u): $uid=(string)$u['id']; $protected=lab_auth_is_protected_admin_id($uid); $isActive=(int)$u['is_active']===1; $isAdmin=(string)$u['role']==='admin'; $resetId=au_reset_form_id($uid); ?>
 <div class="user-row<?=$protected?' admin-row':''?>" data-search="<?=au_h(strtolower((string)$u['username']))?>">
  <div class="user-id"><strong><?=au_h((string)$u['username'])?></strong><div class="account-state muted"><?=au_h((string)$u['role'])?> · <?=$isActive?'Activa':'Desactivada'?><?php if($isAdmin):?> · acceso completo<?php endif;?></div>
- <?php if($protected):?><details class="protected-details"><summary>Cuenta principal protegida</summary><p>Su rol de administrador, estado activo y permiso de gestión de álbumes son permanentes. Nadie puede retirar estos permisos ni desactivar esta cuenta.</p></details><?php endif;?>
+ <?php if($protected):?><details class="protected-details"><summary>Cuenta principal protegida</summary><p>Esta cuenta conserva sus permisos de administración. Está protegida contra la desactivación y la eliminación.</p></details><?php endif;?>
  </div>
  <input type="hidden" name="download[<?=au_h($uid)?>]" value="0"><label class="user-check user-download" title="Permite preparar y descargar audio en M4A o MP3. No concede permisos de gestión."><input type="checkbox" name="download[<?=au_h($uid)?>]" value="1" <?=!empty($downloadPermissions[$uid])?'checked':''?>> Permitir descarga</label>
  <?php if($protected):?>
@@ -248,6 +276,10 @@ $csrf = lab_auth_csrf_token();
   <input class="user-pass" type="password" name="password" form="<?=au_h($resetId)?>" placeholder="Nueva contraseña" aria-label="Nueva contraseña" maxlength="72" autocomplete="new-password" onclick="this.value=''" onfocus="this.value=''" oninput="this.setCustomValidity('')">
   <button class="btn user-reset" type="submit" form="<?=au_h($resetId)?>">Restablecer contraseña</button>
  <?php endif;?>
+ <?php $deleteBlocked=$protected||$uid===(string)($_SESSION['user_id']??''); ?>
+ <button type="button" class="btn user-delete" data-delete-account="<?=au_h($uid)?>" title="<?=au_h($protected?'La cuenta principal está protegida':($deleteBlocked?'No puedes eliminar tu propia cuenta':'Eliminar cuenta'))?>" aria-label="<?=au_h('Eliminar cuenta '.$u['username'])?>" <?=$deleteBlocked?'disabled':''?>>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V4h6v2m4 0-1 14H6L5 6m5 4v6m4-6v6"/></svg>
+ </button>
 </div>
 <?php endforeach;?>
 </div>
@@ -267,8 +299,8 @@ $csrf = lab_auth_csrf_token();
  <span class="hint muted">La fila del administrador está oculta por la búsqueda; este botón guarda igualmente todo el formulario.</span>
 </div>
 <script>
-(()=>{const input=document.getElementById('userSearch');const table=document.getElementById('usersTable');if(!input||!table)return;const rows=[...table.querySelectorAll('.user-row')];const count=document.getElementById('userSearchCount');const empty=document.getElementById('userSearchEmpty');const fallback=document.getElementById('usersBulkFallback');const status=document.getElementById('usersBulkStatus');const bulk=document.getElementById('usersBulkForm');const primary=table.querySelector('.bulk-save-primary');const total=rows.length;function apply(){const q=input.value.trim().toLowerCase();let visible=0;for(const row of rows){const hit=!q||(row.dataset.search||'').includes(q);row.hidden=!hit;if(hit)visible++;}if(count)count.textContent=q?visible+' de '+total+' cuentas':'';if(empty)empty.hidden=visible!==0;if(fallback)fallback.hidden=!(primary&&primary.offsetParent===null);}input.addEventListener('input',apply);apply();document.querySelectorAll('form[id^="reset-"]').forEach(form=>{form.addEventListener('submit',e=>{const pass=form.elements.password;if(!pass)return;if(pass.value.length<14){pass.setCustomValidity('La contraseña debe tener al menos 14 caracteres.');pass.reportValidity();e.preventDefault();return;}pass.setCustomValidity('');});});if(!bulk)return;const markDirty=()=>{bulk.dataset.dirty='1';if(status)status.textContent='Cambios sin guardar';};bulk.addEventListener('change',e=>{if(e.target.matches('input[type=checkbox]'))markDirty();});bulk.addEventListener('submit',()=>{delete bulk.dataset.dirty;if(status)status.textContent='';});window.addEventListener('beforeunload',e=>{if(bulk.dataset.dirty!=='1')return;e.preventDefault();e.returnValue='';});})();
+(()=>{const input=document.getElementById('userSearch');const table=document.getElementById('usersTable');if(!input||!table)return;const rows=[...table.querySelectorAll('.user-row')];const count=document.getElementById('userSearchCount');const empty=document.getElementById('userSearchEmpty');const fallback=document.getElementById('usersBulkFallback');const status=document.getElementById('usersBulkStatus');const bulk=document.getElementById('usersBulkForm');const primary=table.querySelector('.bulk-save-primary');function apply(){const currentRows=rows.filter(row=>row.isConnected);const total=currentRows.length;const q=input.value.trim().toLowerCase();let visible=0;for(const row of currentRows){const hit=!q||(row.dataset.search||'').includes(q);row.hidden=!hit;if(hit)visible++;}if(count)count.textContent=q?visible+' de '+total+' cuentas':'';if(empty)empty.hidden=visible!==0;if(fallback)fallback.hidden=!(primary&&primary.offsetParent===null);}input.addEventListener('input',apply);table.addEventListener('sf:account-deleted',apply);apply();document.querySelectorAll('form[id^="reset-"]').forEach(form=>{form.addEventListener('submit',e=>{const pass=form.elements.password;if(!pass)return;if(pass.value.length<14){pass.setCustomValidity('La contraseña debe tener al menos 14 caracteres.');pass.reportValidity();e.preventDefault();return;}pass.setCustomValidity('');});});if(!bulk)return;const markDirty=()=>{bulk.dataset.dirty='1';if(status)status.textContent='Cambios sin guardar';};bulk.addEventListener('change',e=>{if(e.target.matches('input[type=checkbox]'))markDirty();});bulk.addEventListener('submit',()=>{delete bulk.dataset.dirty;if(status)status.textContent='';});window.addEventListener('beforeunload',e=>{if(bulk.dataset.dirty!=='1')return;e.preventDefault();e.returnValue='';});})();
 </script>
 </section>
 <section class="card"><h2>Qué puede hacer cada tipo de cuenta</h2><ul><li><strong>Administrador:</strong> acceso completo, configuración y administración de cuentas.</li><li><strong>Usuario con permiso de álbumes:</strong> reproducción y biblioteca, además de crear álbumes, subir audio, importar desde YouTube y editar/eliminar álbumes y pistas.</li><li><strong>Usuario estándar:</strong> solo explorar la biblioteca y reproducir audio.</li></ul><p class="hint muted">Las contraseñas se guardan mediante password_hash(). El panel nunca muestra hashes ni contraseñas existentes.</p></section></main><link rel="stylesheet" href="assets/player.css?v=mini-contrast1"><script src="assets/navigation.js?v=album-return1"></script>
-<link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=3"></script><script src="assets/shell-player.js?v=20261116-console1"></script></body></html>
+<link rel="stylesheet" href="assets/player-icons.css?v=3"><script src="assets/player-icons.js?v=3"></script><script src="assets/admin-users-delete.js?v=1" defer></script><script src="assets/shell-player.js?v=20261116-console1"></script></body></html>
